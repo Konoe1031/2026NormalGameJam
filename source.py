@@ -1,0 +1,37 @@
+import pygame
+import setting
+import os
+
+def load_source(path: str, scale: int = 1) -> pygame.Surface:
+	img: pygame.Surface = None
+	for kind in ("jpg", "png", "jpeg"):
+		file = f"./texture/{path}.{kind}"
+		if os.path.exists(file):
+			img = pygame.image.load(file)
+			break
+	factor = max(scale, 1) * setting.tile_size / min(img.get_width(), img.get_height())
+	return pygame.transform.scale(img, (img.get_width() * factor, img.get_height() * factor))
+
+background_dict = {
+	"grass": 2,
+	"ocean": 1
+}
+# [type of land][number of variant]
+background: dict[str, list[pygame.Surface]] = {}
+for land, count in background_dict.items():
+	background[land] = []
+	for i in range(count):
+		background[land].append(load_source(f"{land}{i}"))
+
+foreground_dict = {
+	"grass": {
+		"mango_tree": 1
+	}
+}
+# [type of land][type of item][chance %]
+foreground: dict[str, dict[str, pygame.Surface]] = {}
+for land, content in foreground_dict.items():
+	foreground[land] = {}
+	for item in content.keys():
+		foreground[land][item] = load_source(f"{land}_{item}")
+		
