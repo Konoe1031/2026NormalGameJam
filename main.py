@@ -33,6 +33,7 @@ while running:
 	if hotkeys["move_down"].pressed(): y += .25
 	# Game
 	map.draw_background(screen, (x, y))
+	map.draw_foreground(screen, (x, y))
 	# Display
 	pygame.display.flip()
 	clock.tick(60)
