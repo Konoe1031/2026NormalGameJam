@@ -20,12 +20,11 @@ def get_background_tile(x: int, y: int) -> pygame.Surface:
 
 def draw_background(screen: pygame.Surface, player_position: Tuple[float, float]):
 	tile = background_source["grass"][0]
-	print(player_position)
 	px = player_position[0] * background_size - screen.get_width() / 2
 	py = player_position[1] * background_size - screen.get_height() / 2
-	dx = px - math.ceil(px / background_size) * background_size
+	dx = math.floor(px / background_size) * background_size - px
 	while dx < screen.get_width():
-		dy = py - math.ceil(py / background_size) * background_size
+		dy = math.floor(py / background_size) * background_size - py
 		while dy < screen.get_height():
 			tile = get_background_tile((px + dx) // background_size, (py + dy) // background_size)
 			screen.blit(tile, (dx, dy))
