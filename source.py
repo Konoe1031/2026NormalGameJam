@@ -36,6 +36,7 @@ for land, count in background_dict.items():
 
 foreground_dict = {
 	"grass": {
+		"mango": {"chance": .1, "source": True},
 		"mango_tree": {"chance": 1, "source": True},
 		"empty_mango_tree": {"chance": 0, "source": False},
 		"plank": {"chance": 1, "source": True},

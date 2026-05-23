@@ -16,7 +16,7 @@ def get_biome(x: int, y: int) -> str:
 	if is_home_position(x, y):
 		return "home"
 	random.seed(f"biome({int(x)},{int(y)},{setting.seed})")
-	distance = abs(x + y + random.randint(-1, 1))
+	distance = abs(x + random.randint(-1, 1)) + abs(y + random.randint(-1, 1))
 	if distance < 50:
 		return "grass"
 	if distance < 150:

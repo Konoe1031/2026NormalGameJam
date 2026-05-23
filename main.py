@@ -18,7 +18,6 @@ def check_interaction():
 			print("inventory is full")
 			continue
 		source.foreground_override[x, y] = f"empty_{item}"
-		print(f"you've got a {item}")
 	return
 def open_inventory():
 	global inventory_open

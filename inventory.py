@@ -13,6 +13,8 @@ slots: list[dict[str, str | int] | None] = [None] * SLOT_COUNT
 
 
 def add_item(item: str) -> bool:
+	if item == "mango_tree":
+		item = "mango"
 	for slot in slots:
 		if slot != None and slot["item"] == item and slot["count"] < MAX_STACK:
 			slot["count"] += 1
