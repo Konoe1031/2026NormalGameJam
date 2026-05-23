@@ -11,11 +11,11 @@ class player_t:
 	def move(self, x: float, y: float):
 		# target position
 		tx, ty = self.x + x, self.y + y
+		biome = map.get_biome(tx // 1, ty // 1)
+		if biome == "ocean" or biome == "home":
+			return self
 		item = map.get_foreground_item(tx // 1, ty // 1)
 		if item != None:
-			return self
-		biome = map.get_biome(tx // 1, ty // 1)
-		if biome == "ocean":
 			return self
 		self.x, self.y = tx, ty
 		return self

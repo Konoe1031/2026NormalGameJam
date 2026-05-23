@@ -11,6 +11,7 @@ scene = "home"
 inventory_open = False
 
 player = player_t()
+
 def check_interaction():
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
