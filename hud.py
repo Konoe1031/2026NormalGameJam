@@ -1,4 +1,5 @@
 import pygame
+import math
 import setting
 import source
 
@@ -25,9 +26,23 @@ def draw_player_state(screen: pygame.Surface, player):
 	value = max(0, min(player.state, MAX_STATE)) / MAX_STATE
 	layer = pygame.Surface((BAR_X + BAR_WIDTH + 24, Y + ICON_SIZE + 12), pygame.SRCALPHA)
 
+	jump_interval = 2800 - int((value ** 1.7) * 1300)
+	if value >= .35:
+		jump_interval -= 350
+	if value >= .65:
+		jump_interval -= 450
+	if value >= .85:
+		jump_interval -= 350
+	jump_interval = max(450, jump_interval)
+	jump_duration = 360
+	jump_height = 5 + value * 11
+	jump_phase = pygame.time.get_ticks() % jump_interval
+	jump = 0
+	if jump_phase < jump_duration:
+		jump = -math.sin(math.pi * jump_phase / jump_duration) * jump_height
 	icon = pygame.transform.smoothscale(source.virus_icon, (ICON_SIZE, ICON_SIZE))
 	icon.set_alpha(245)
-	layer.blit(icon, (X, Y))
+	layer.blit(icon, (X, Y + jump))
 
 	fill_width = int(BAR_WIDTH * value)
 	if fill_width > 0:

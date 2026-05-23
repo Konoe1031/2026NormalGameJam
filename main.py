@@ -103,6 +103,7 @@ while running:
 		if inventory_open:
 			inventory.draw(screen)
 			base.draw_info(screen)
+		map.draw_virus_flash(screen)
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":
