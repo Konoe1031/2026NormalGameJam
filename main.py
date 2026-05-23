@@ -27,13 +27,15 @@ def close_inventory():
 	global inventory_open
 	inventory_open = False
 	return
+
 hotkeys: dict[str, hotkey_t] = {
 	"move_left": hotkey_t([pygame.K_LEFT, pygame.K_a]),
 	"move_right": hotkey_t([pygame.K_RIGHT, pygame.K_d]),
 	"move_up": hotkey_t([pygame.K_UP, pygame.K_w]),
 	"move_down": hotkey_t([pygame.K_DOWN, pygame.K_s]),
 	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction),
-	"inventory": hotkey_t([pygame.K_TAB], on_down=open_inventory, on_up=close_inventory)
+	"inventory": hotkey_t([pygame.K_TAB], on_down=open_inventory, on_up=close_inventory),
+	"prevent": hotkey_t([pygame.K_LSHIFT, pygame.K_RSHIFT])
 }
 
 while running:
@@ -47,6 +49,9 @@ while running:
 		if event.type == pygame.KEYUP:
 			for keys in hotkeys.values():
 				keys.check_up(event.key)
+	player.action = None
+	if hotkeys["prevent"].pressed():
+		player.action = "prevent"
 	if hotkeys["move_left"].pressed():
 		player.move(-player.speed(), 0)
 	if hotkeys["move_right"].pressed():

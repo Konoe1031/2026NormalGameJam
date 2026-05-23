@@ -3,16 +3,23 @@ import source, map, setting
 
 class player_t:
 	def __init__(self):
-		self.image = source.load_source("girl", 2)
+		self.images = source.girl["fallback"]
 		# the position of the feet
 		self.x = 0
 		self.y = 0
+		self.facing = "down"
 		self.touch_distance = 1
-		self.state = 100
+		self.state = 0
 		self.cooldown = 0
 		self.speed_base = .125
+		self.action = False
 	def move(self, x: float, y: float):
-		self.cooldown -= 1
+		if x > 0: self.facing = "right"
+		if x < 0: self.facing = "left"
+		if y > 0: self.facing = "down"
+		if y < 0: self.facing = "up"
+		if self.action == "prevent":
+			return self
 		if self.cooldown > pygame.time.get_ticks():
 			return self
 		if pygame.time.get_ticks() - self.cooldown > 5000: # 5 sec
@@ -28,6 +35,7 @@ class player_t:
 		biome = map.get_biome(tx // 1, ty // 1, self)
 		if biome in ("ocean", "void"):
 			return self
+		self.action = "walk"
 		self.x, self.y = tx, ty
 		return self
 	def speed(self):
@@ -39,7 +47,14 @@ class player_t:
 			return random.uniform(.25, 1) * base
 		return base
 	def draw(self, screen: pygame.Surface):
-		x = (screen.get_width() - self.image.get_width()) / 2
-		y = (screen.get_height() + setting.tile_size) / 2 - self.image.get_height()
-		screen.blit(self.image, (x, y))
+		if self.action == "prevent":
+			if self.facing in ("left", "down"):
+				self.images = source.girl["left_prevent"]
+			else: self.images = source.girl["right_prevent"]
+		else: self.images = source.girl["fallback"]
+		image = self.images[pygame.time.get_ticks() // 500 % len(self.images)]
+		x = (screen.get_width() - image.get_width()) / 2
+		y = (screen.get_height() + setting.tile_size) / 2 - image.get_height()
+		screen.blit(image , (x, y))
 		return self
+	

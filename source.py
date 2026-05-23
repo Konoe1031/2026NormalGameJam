@@ -3,7 +3,7 @@ import setting
 import os
 from typing import Tuple
 
-def load_source(path: str, scale: int = 1) -> pygame.Surface:
+def load_source(path: str, scale: float = 1) -> pygame.Surface:
 	img: pygame.Surface = None
 	for kind in ("jpg", "png", "jpeg"):
 		file = f"./texture/{path}.{kind}"
@@ -54,3 +54,10 @@ for land, content in foreground_dict.items():
 	for item in content.keys():
 		foreground[land][item] = load_source(f"{land}_{item}")
 foreground_override: dict[Tuple[int, int], str] = {}
+
+# [facing][animation]
+girl: dict[str, list[pygame.Surface]] = {
+	"fallback": [load_source("girl", 2)],
+	"left_prevent": [load_source("girl_left_prevent", 2)],
+	"right_prevent": [load_source("girl_right_prevent", 2)]
+}
