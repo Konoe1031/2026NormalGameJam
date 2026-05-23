@@ -21,11 +21,14 @@ class player_t:
 		if self.action == "prevent":
 			return self
 		if self.cooldown > pygame.time.get_ticks():
+			self.action = "stuck"
 			return self
 		if pygame.time.get_ticks() - self.cooldown > 5000: # 5 sec
 			movability = self.state - setting.player_state["movability"]
 			if movability > 0 and random.uniform(0, 100) < movability:
 				self.cooldown = pygame.time.get_ticks() + 500
+				self.action = "stuck"
+				return self
 			else: self.cooldown = pygame.time.get_ticks()
 		# target position
 		tx, ty = self.x + x, self.y + y
@@ -52,6 +55,10 @@ class player_t:
 			if self.facing in ("left", "down"):
 				self.images = source.girl.get("left_prevent")
 			else: self.images = source.girl.get("right_prevent")
+		if self.action == "stuck":
+			if self.facing in ("left", "down"):
+				self.images = source.girl.get("left_stuck")
+			else: self.images = source.girl.get("right_stuck")
 		if self.action == "walk":
 			self.images = source.girl.get(f"{self.facing}_walk")
 		if self.images == None:

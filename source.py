@@ -71,8 +71,10 @@ foreground_override: dict[Tuple[int, int], str] = {}
 # [facing][animation]
 girl: dict[str, list[pygame.Surface]] = {
 	"fallback": [load_source("girl", 2)],
-	"left_prevent": [load_source("girl_left_prevent", 2)],
-	"right_prevent": [load_source("girl_right_prevent", 2)],
+	"left_prevent": [load_source("girl_vomit_1", 2)],
+	"right_prevent": [load_source("girl_vomit_2", 2)],
+	"left_stuck": [load_source("girl_left_prevent", 2)],
+	"right_stuck": [load_source("girl_right_prevent", 2)],
 	"up_walk": [load_source(f"girl_up_walk{i}", 2) for i in (0,1,0,2)],
 	"down_walk": [load_source(f"girl_down_walk{i}", 2) for i in (0,1,0,2)],
 	"left_walk": [load_source(f"girl_left_walk{i}", 2) for i in (0,1,0,2)],
