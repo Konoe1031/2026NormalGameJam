@@ -8,6 +8,7 @@ PAD = 40
 TYPE_SPEED = 15  # 每秒顯示的字數
 TYPING_SOUND = "./audio/typing.mp3"
 SOUND_START = 1.0  # 從音檔第幾秒開始播（跳過開頭靜音）
+FONT_PATH = os.path.join(os.path.dirname(__file__), "fonts", "NotoSansTC.ttf")
 
 _font: pygame.font.Font = None
 _hint_font: pygame.font.Font = None
@@ -21,7 +22,10 @@ _sound_on = False
 
 
 def _cjk_font(size: int) -> pygame.font.Font:
-	for name in ("stheitimedium", "arialunicode", "hiraginosansgb", "applesdgothicneo"):
+	if os.path.exists(FONT_PATH):
+		return pygame.font.Font(FONT_PATH, size)
+	for name in ("stheitimedium", "arialunicode", "hiraginosansgb", "applesdgothicneo",
+	             "microsoftjhenghei", "microsoftyahei", "notosanscjktc"):
 		path = pygame.font.match_font(name)
 		if path:
 			return pygame.font.Font(path, size)
