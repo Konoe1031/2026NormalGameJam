@@ -1,7 +1,7 @@
 import pygame
 
 WIDTH, HEIGHT = 960, 720
-BTN_SCALE = 1.3
+BTN_SCALE = 1.5
 
 _cover: pygame.Surface = None
 _font: pygame.font.Font = None
@@ -27,9 +27,9 @@ def _ensure_init():
 	_cover = pygame.transform.scale(pygame.image.load("./cg/home_page.png"), (WIDTH, HEIGHT))
 	_font = pygame.font.SysFont(None, 40)
 
-	margin, gap = 60, 22
-	setting = _place("setting", bottomright=(WIDTH - margin, HEIGHT - margin))
-	start = _place("start", bottomright=(WIDTH - margin, setting["rect"].top - gap))
+	right_margin, bottom_margin, gap = 95, 60, 34
+	setting = _place("setting", bottomright=(WIDTH - right_margin, HEIGHT - bottom_margin))
+	start = _place("start", bottomright=(WIDTH - right_margin, setting["rect"].top - gap))
 	_buttons = {"start": start, "settings": setting}
 	_back_button = _place("back", topleft=(40, 40))
 
