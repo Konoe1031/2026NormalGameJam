@@ -32,10 +32,18 @@ for land, count in background_dict.items():
 
 foreground_dict = {
 	"grass": {
-		"mango_tree": { "chance": 1, "source": False }
+		"mango_tree": {"chance": 1, "source": True},
+		"empty_mango_tree": {"chance": 0, "source": False},
+		"plank": {"chance": 1, "source": True},
+		"metal": {"chance": .05, "source": True}
 	},
 	"clay": {
-		"bone": { "chance": 1, "source": True }
+		"can": {"chance": .25, "source": True},
+		"bone": {"chance": 1, "source": True},
+		"metal": {"chance": .5, "source": True}
+	},
+	"lake": {
+		"cake": {"chance":.05, "source": True}
 	}
 }
 # [type of land][type of item][chance %]

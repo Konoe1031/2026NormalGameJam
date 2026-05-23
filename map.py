@@ -72,7 +72,7 @@ def __draw_foreground(screen: pygame.Surface, player: player.player_t, ix: int, 
 	biome, name = get_foreground_item_name(ix, iy)
 	if source.foreground_dict[biome][name]["source"] and\
 		abs(ix - player.x + .5) + abs(iy - player.y + .5) <= player.touch_distance:
-		screen.blit(source.hints["e"], (dx, y))
+		screen.blit(source.hints["e"], (dx, dy))
 		interactable.append((ix, iy))
 	return
 def draw_foreground(screen: pygame.Surface, player: player.player_t):
