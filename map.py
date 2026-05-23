@@ -28,7 +28,7 @@ def get_biome(x: int, y: int, player: player_t) -> str:
 	x //= 1; y //= 1
 	if is_home_position(x, y):
 		return "home"
-	if (player.x // 1 != x or player.y// 1 != y) and player.state >= setting.player_state["void"]:
+	if (player.x // 1 != x or player.y // 1 != y) and player.state >= setting.player_state["void"]:
 		random.seed(f"void({int(x)},{int(y)},{setting.seed})")
 		if random.uniform(0, 100) < 1:
 			return "void"

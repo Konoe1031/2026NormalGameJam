@@ -49,12 +49,14 @@ foreground_dict = {
 		"can": {"chance": .25, "source": True},
 		"bone": {"chance": 1, "source": True},
 		"metal": {"chance": .5, "source": True},
-		"drug": {"chance": .25, "source": True},
-		"outlet": {"chance": .5, "source": False}
+		"drug": {"chance": .1, "source": True},
+		"outlet": {"chance": .25, "source": False}
 	},
 	"lake": {
-		"cake": {"chance": 1, "source": True},
-		"outlet": {"chance": 2, "source": False}
+		"metal": {"chance": .75, "source": True},
+		"cake": {"chance": .5, "source": True},
+		"drug": {"chance": .5, "source": True},
+		"outlet": {"chance": 1, "source": False}
 	}
 }
 # [type of land][type of item][chance %]
