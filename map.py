@@ -1,7 +1,7 @@
 import pygame
 import random
 import setting, source, player
-from typing import Tuple, TYPE_CHECKING
+from typing import Tuple
 
 def get_biome(x: int, y: int) -> str:
 	random.seed(f"biome({int(x)},{int(y)},{setting.seed})")
