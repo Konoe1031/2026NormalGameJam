@@ -6,6 +6,8 @@ WIDTH, HEIGHT = 960, 720
 BOX_H = 200
 PAD = 40
 TYPE_SPEED = 15  # 每秒顯示的字數
+TYPING_SOUND = "./audio/typing.mp3"
+SOUND_START = 1.0  # 從音檔第幾秒開始播（跳過開頭靜音）
 
 _font: pygame.font.Font = None
 _hint_font: pygame.font.Font = None
@@ -14,6 +16,8 @@ _beats: list[dict[str, str]] = []
 _index = 0
 _typed = 0.0
 _last_ms: int | None = None
+_audio_ok = False
+_sound_on = False
 
 
 def _cjk_font(size: int) -> pygame.font.Font:
@@ -25,11 +29,23 @@ def _cjk_font(size: int) -> pygame.font.Font:
 
 
 def _ensure_init() -> None:
-	global _font, _hint_font
+	global _font, _hint_font, _audio_ok
 	if _font is not None:
 		return
 	_font = _cjk_font(32)
 	_hint_font = _cjk_font(24)
+	if not pygame.mixer.get_init():
+		try:
+			pygame.mixer.init()
+		except pygame.error as e:
+			print(f"story: 音訊初始化失敗，劇情將無音效：{e}")
+	_audio_ok = pygame.mixer.get_init() is not None
+	if _audio_ok:
+		try:
+			pygame.mixer.music.load(TYPING_SOUND)
+		except pygame.error as e:
+			print(f"story: 載入 {TYPING_SOUND} 失敗，劇情將無音效：{e}")
+			_audio_ok = False
 
 
 def load(script: str = "intro") -> None:
@@ -54,6 +70,20 @@ def _update_typing(text: str) -> None:
 	dt = now - _last_ms
 	_last_ms = now
 	_typed = min(_typed + dt * TYPE_SPEED / 1000.0, len(text))
+
+
+def _start_typing_sound() -> None:
+	global _sound_on
+	if _audio_ok and not _sound_on:
+		pygame.mixer.music.play(-1, start=SOUND_START)
+		_sound_on = True
+
+
+def _stop_typing_sound() -> None:
+	global _sound_on
+	if _audio_ok and _sound_on:
+		pygame.mixer.music.stop()
+		_sound_on = False
 
 
 def _get_cg(name: str) -> pygame.Surface:
@@ -108,6 +138,10 @@ def draw(screen: pygame.Surface) -> None:
 	_update_typing(beat["text"])
 	shown = int(_typed)
 	done = shown >= len(beat["text"])
+	if done:
+		_stop_typing_sound()
+	else:
+		_start_typing_sound()
 	screen.blit(_get_cg(beat["cg"]), (0, 0))
 	_draw_textbox(screen, beat["text"][:shown], done)
 
@@ -118,9 +152,11 @@ def advance() -> bool:
 		return True
 	if _typed < len(_beats[_index]["text"]):
 		_typed = float(len(_beats[_index]["text"]))
+		_stop_typing_sound()
 		return False
 	_index += 1
 	if _index >= len(_beats):
+		_stop_typing_sound()
 		return True
 	_reset_typing()
 	return False

@@ -2,11 +2,13 @@ import pygame
 
 WIDTH, HEIGHT = 960, 720
 BTN_SCALE = 1.5
+BUTTON_SOUND = "./audio/button.mp3"
 
 _cover: pygame.Surface = None
 _font: pygame.font.Font = None
 _buttons: dict[str, dict] = {}
 _back_button: dict = None
+_click_sound: pygame.mixer.Sound | None = None
 
 
 def _place(name: str, **anchor) -> dict:
@@ -21,7 +23,7 @@ def _place(name: str, **anchor) -> dict:
 
 
 def _ensure_init():
-	global _cover, _font, _buttons, _back_button
+	global _cover, _font, _buttons, _back_button, _click_sound
 	if _cover is not None:
 		return
 	_cover = pygame.transform.scale(pygame.image.load("./cg/home_page.png"), (WIDTH, HEIGHT))
@@ -32,6 +34,22 @@ def _ensure_init():
 	start = _place("start", bottomright=(WIDTH - right_margin, setting["rect"].top - gap))
 	_buttons = {"start": start, "settings": setting}
 	_back_button = _place("back", topleft=(40, 40))
+
+	if not pygame.mixer.get_init():
+		try:
+			pygame.mixer.init()
+		except pygame.error as e:
+			print(f"home: 音訊初始化失敗，按鈕將無音效：{e}")
+	if pygame.mixer.get_init():
+		try:
+			_click_sound = pygame.mixer.Sound(BUTTON_SOUND)
+		except pygame.error as e:
+			print(f"home: 載入 {BUTTON_SOUND} 失敗，按鈕將無音效：{e}")
+
+
+def _play_click() -> None:
+	if _click_sound is not None:
+		_click_sound.play()
 
 
 def _draw_button(screen: pygame.Surface, btn: dict) -> None:
@@ -54,6 +72,7 @@ def handle_click(pos: tuple[int, int]) -> str | None:
 	_ensure_init()
 	for key, btn in _buttons.items():
 		if btn["rect"].collidepoint(pos):
+			_play_click()
 			return key
 	return None
 
@@ -69,5 +88,6 @@ def draw_settings(screen: pygame.Surface) -> None:
 def handle_settings_click(pos: tuple[int, int]) -> str | None:
 	_ensure_init()
 	if _back_button["rect"].collidepoint(pos):
+		_play_click()
 		return "back"
 	return None
