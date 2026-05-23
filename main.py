@@ -7,7 +7,7 @@ pygame.init()
 screen = pygame.display.set_mode((960, 720))
 clock = pygame.time.Clock()
 running = True
-scene = "home"  # "home" | "game" | "settings"
+scene = "home"
 inventory_open = False
 
 player = player_t()
