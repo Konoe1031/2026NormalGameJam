@@ -57,8 +57,6 @@ def _get_cg(name: str) -> pygame.Surface:
 
 
 def _wrap(text: str, max_w: int) -> list[str]:
-	# Character-based wrapping: works for CJK (no spaces) and is good enough
-	# for latin in a jam. Honours explicit newlines in the script.
 	lines: list[str] = []
 	for paragraph in text.split("\n"):
 		line = ""
