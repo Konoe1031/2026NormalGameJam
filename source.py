@@ -17,6 +17,10 @@ hints: dict[str, pygame.Surface] = {}
 for key in ("e"):
 	hints[key] = load_source(f"hint_{key}")
 
+structures: dict[str, pygame.Surface] = {
+	"home": load_source("home", 9)
+}
+
 background_dict = {
 	"grass": 3,
 	"clay": 3,
