@@ -68,6 +68,7 @@ while running:
 	map.draw_foreground(screen, player)
 	if inventory_open:
 		inventory.draw(screen)
+		base.draw_info(screen)
 	# Display
 	pygame.display.flip()
 	clock.tick(60)

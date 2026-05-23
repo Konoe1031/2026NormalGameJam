@@ -13,11 +13,12 @@ def is_home_position(x: int, y: int) -> bool:
 	return home_x <= int(x) < home_x + width and home_y - height + 1 <= int(y) <= home_y
 
 def get_biome(x: int, y: int, player: player_t) -> str:
+	x //= 1; y //= 1
 	if is_home_position(x, y):
 		return "home"
-	if (player.x != x or player.y != y) and player.state >= setting.player_state["void"]:
+	if (player.x // 1 != x or player.y// 1 != y) and player.state >= setting.player_state["void"]:
 		random.seed(f"void({int(x)},{int(y)},{setting.seed})")
-		if random.uniform(0,100) < 1:
+		if random.uniform(0, 100) < 1:
 			return "void"
 	random.seed(f"biome({int(x)},{int(y)},{setting.seed})")
 	distance = abs(x + random.randint(-1, 1)) + abs(y + random.randint(-1, 1))

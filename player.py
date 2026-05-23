@@ -9,15 +9,15 @@ class player_t:
 		self.y = 0
 		self.facing = "down"
 		self.touch_distance = 1
-		self.state = 0
+		self.state = 100
 		self.cooldown = 0
 		self.speed_base = .125
-		self.action = False
+		self.action = None
 	def move(self, x: float, y: float):
-		if x > 0: self.facing = "right"
-		if x < 0: self.facing = "left"
 		if y > 0: self.facing = "down"
 		if y < 0: self.facing = "up"
+		if x > 0: self.facing = "right"
+		if x < 0: self.facing = "left"
 		if self.action == "prevent":
 			return self
 		if self.cooldown > pygame.time.get_ticks():
