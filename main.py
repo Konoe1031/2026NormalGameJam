@@ -57,6 +57,10 @@ while running:
 				elif action == "settings":
 					scene = "settings"
 		elif scene == "story":
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+				story.skip()
+				scene = "game"
+				continue
 			advance = (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1) or \
 				(event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN))
 			if advance and story.advance():

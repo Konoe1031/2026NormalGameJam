@@ -150,6 +150,12 @@ def draw(screen: pygame.Surface) -> None:
 	_draw_textbox(screen, beat["text"][:shown], done)
 
 
+def skip() -> None:
+	global _index
+	_stop_typing_sound()
+	_index = len(_beats)
+
+
 def advance() -> bool:
 	global _index, _typed
 	if not _beats:
