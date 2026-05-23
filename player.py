@@ -47,12 +47,16 @@ class player_t:
 			return random.uniform(.25, 1) * base
 		return base
 	def draw(self, screen: pygame.Surface):
+		self.images = None
 		if self.action == "prevent":
 			if self.facing in ("left", "down"):
-				self.images = source.girl["left_prevent"]
-			else: self.images = source.girl["right_prevent"]
-		else: self.images = source.girl["fallback"]
-		image = self.images[pygame.time.get_ticks() // 500 % len(self.images)]
+				self.images = source.girl.get("left_prevent")
+			else: self.images = source.girl.get("right_prevent")
+		if self.action == "walk":
+			self.images = source.girl.get(f"{self.facing}_walk")
+		if self.images == None:
+			self.images = source.girl["fallback"]
+		image = self.images[pygame.time.get_ticks() // 250 % len(self.images)]
 		x = (screen.get_width() - image.get_width()) / 2
 		y = (screen.get_height() + setting.tile_size) / 2 - image.get_height()
 		screen.blit(image , (x, y))
