@@ -12,7 +12,7 @@ _hint_font: pygame.font.Font = None
 _cg_cache: dict[str, pygame.Surface] = {}
 _beats: list[dict[str, str]] = []
 _index = 0
-_typed = 0.0          # 目前已顯示的字數（浮點數，依時間累加）
+_typed = 0.0
 _last_ms: int | None = None
 
 
@@ -116,11 +116,9 @@ def advance() -> bool:
 	global _index, _typed
 	if not _beats:
 		return True
-	# 還在打字 → 先把整段文字立刻顯示完，不換頁
 	if _typed < len(_beats[_index]["text"]):
 		_typed = float(len(_beats[_index]["text"]))
 		return False
-	# 已顯示完 → 換下一頁
 	_index += 1
 	if _index >= len(_beats):
 		return True
