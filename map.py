@@ -1,6 +1,6 @@
 import pygame
 import random
-import setting, source
+import setting, source, inventory
 from player import player_t
 from typing import Tuple
 
@@ -21,7 +21,7 @@ def get_biome(x: int, y: int, player: player_t) -> str:
 			return "void"
 	random.seed(f"biome({int(x)},{int(y)},{setting.seed})")
 	distance = abs(x + random.randint(-1, 1)) + abs(y + random.randint(-1, 1))
-	if distance < 50:
+	if distance < 75:
 		return "grass"
 	if distance < 150:
 		return "clay"
@@ -38,7 +38,7 @@ def get_foreground_item_name(x: int, y: int, player: player_t) -> Tuple[str, str
 	biome = get_biome(x, y, player)
 	if biome == "home":
 		return biome, None
-	override = source.foreground_override.setdefault((x, y), None)
+	override = source.foreground_override.get((x, y))
 	if override != None:
 		return biome, override
 	random.seed(f"fgitem({int(x)},{int(y)},{setting.seed})")
@@ -61,7 +61,7 @@ def get_foreground_item(x: int, y: int, player: player_t) -> pygame.Surface | No
 		return None
 	if name in source.structures:
 		return source.structures[name]
-	return source.foreground[biome].setdefault(name, None)
+	return source.foreground[biome].get(name)
 
 def draw_background(screen: pygame.Surface, player: player_t):
 	tile = source.background["grass"][0]
@@ -87,7 +87,6 @@ def __get_screen_position(screen: pygame.Surface, player: player_t, x: int, y: i
 	px = player.x * setting.tile_size - screen.get_width() / 2
 	py = player.y * setting.tile_size - screen.get_height() / 2
 	return x * setting.tile_size - px, y * setting.tile_size - py
-
 def __draw_home(screen: pygame.Surface, player: player_t):
 	home = source.structures["home"]
 	home_x, home_y = home_position
@@ -98,7 +97,6 @@ def __draw_home(screen: pygame.Surface, player: player_t):
 	if y > screen.get_height() or y + home.get_height() < 0:
 		return
 	screen.blit(home, (x, y))
-
 def __draw_foreground(screen: pygame.Surface, player: player_t, ix: int, iy: int, dx: float, dy: float):
 	item = get_foreground_item(ix, iy, player)
 	if item == None:
@@ -131,6 +129,8 @@ def draw_foreground(screen: pygame.Surface, player: player_t):
 			ix += 1
 		dy += setting.tile_size
 		iy += 1
+	if get_biome(player.x, player.y - 1, player) == "home" and inventory.slots[0] != None:
+		screen.blit(source.hints["e"], ((screen.get_width() - setting.tile_size) / 2, (screen.get_height() - 5 * setting.tile_size) / 2))
 	player.draw(screen)
 	while dy < screen.get_height():
 		dx = -(px % setting.tile_size)

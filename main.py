@@ -1,5 +1,5 @@
 import pygame
-import inventory, map, source
+import inventory, map, source, base
 from player import player_t
 from hotkey import hotkey_t
 
@@ -12,6 +12,9 @@ inventory_open = False
 player = player_t()
 
 def check_interaction():
+	global player
+	if map.get_biome(player.x, player.y - 1, player) == "home":
+		base.store_resource()
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
 		if not inventory.add_item(item):

@@ -11,7 +11,6 @@ MAX_STACK = 7
 
 slots: list[dict[str, str | int] | None] = [None] * SLOT_COUNT
 
-
 def add_item(item: str) -> bool:
 	if item == "mango_tree":
 		item = "mango"
@@ -21,20 +20,15 @@ def add_item(item: str) -> bool:
 			return True
 	for index, slot in enumerate(slots):
 		if slot == None:
-			slots[index] = {
-				"item": item,
-				"count": 1
-			}
+			slots[index] = {"item": item, "count": 1}
 			return True
 	return False
-
 
 def get_item_image(item: str) -> pygame.Surface | None:
 	for biome_items in source.foreground.values():
 		if item in biome_items:
 			return biome_items[item]
 	return None
-
 
 def draw(screen: pygame.Surface):
 	width = COLUMNS * SLOT_SIZE + (COLUMNS - 1) * SLOT_GAP
