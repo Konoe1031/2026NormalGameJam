@@ -12,4 +12,3 @@ class hotkey_t:
 		return self
 	def pressed(self) -> bool:
 		return self.press
-	

@@ -1,6 +1,7 @@
 import pygame
 import setting
 import os
+from typing import Tuple
 
 def load_source(path: str, scale: int = 1) -> pygame.Surface:
 	img: pygame.Surface = None
@@ -12,8 +13,14 @@ def load_source(path: str, scale: int = 1) -> pygame.Surface:
 	factor = max(scale, 1) * setting.tile_size / min(img.get_width(), img.get_height())
 	return pygame.transform.scale(img, (img.get_width() * factor, img.get_height() * factor))
 
+hints: dict[str, pygame.Surface] = {}
+for key in ("e"):
+	hints[key] = load_source(f"hint_{key}")
+
 background_dict = {
-	"grass": 2,
+	"grass": 3,
+	"clay": 3,
+	"lake": 3,
 	"ocean": 1
 }
 # [type of land][number of variant]
@@ -25,7 +32,10 @@ for land, count in background_dict.items():
 
 foreground_dict = {
 	"grass": {
-		"mango_tree": 1
+		"mango_tree": { "chance": 1, "source": False }
+	},
+	"clay": {
+		"bone": { "chance": 1, "source": True }
 	}
 }
 # [type of land][type of item][chance %]
@@ -34,4 +44,4 @@ for land, content in foreground_dict.items():
 	foreground[land] = {}
 	for item in content.keys():
 		foreground[land][item] = load_source(f"{land}_{item}")
-		
+foreground_override: dict[Tuple[int, int], str] = {}
