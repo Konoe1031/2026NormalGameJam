@@ -5,7 +5,7 @@ import pygame
 WIDTH, HEIGHT = 960, 720
 BOX_H = 200
 PAD = 40
-TYPE_SPEED = 30  # 每秒顯示的字數
+TYPE_SPEED = 15  # 每秒顯示的字數
 
 _font: pygame.font.Font = None
 _hint_font: pygame.font.Font = None
