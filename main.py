@@ -1,27 +1,39 @@
 import pygame
-import map, source
+import inventory, map, source
 from player import player_t
 from hotkey import hotkey_t
-from typing import Tuple
 
 pygame.init()
 screen = pygame.display.set_mode((960, 720))
 clock = pygame.time.Clock()
 running = True
+inventory_open = False
 
 player = player_t(clock)
 def check_interaction():
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
+		if not inventory.add_item(item):
+			print("inventory is full")
+			continue
 		source.foreground_override[x, y] = f"empty_{item}"
 		print(f"you've got a {item}")
+	return
+def open_inventory():
+	global inventory_open
+	inventory_open = True
+	return
+def close_inventory():
+	global inventory_open
+	inventory_open = False
 	return
 hotkeys: dict[str, hotkey_t] = {
 	"move_left": hotkey_t([pygame.K_LEFT, pygame.K_a]),
 	"move_right": hotkey_t([pygame.K_RIGHT, pygame.K_d]),
 	"move_up": hotkey_t([pygame.K_UP, pygame.K_w]),
 	"move_down": hotkey_t([pygame.K_DOWN, pygame.K_s]),
-	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction)
+	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction),
+	"inventory": hotkey_t([pygame.K_TAB], on_down=open_inventory, on_up=close_inventory)
 }
 
 while running:
@@ -46,6 +58,8 @@ while running:
 	# Game
 	map.draw_background(screen, player)
 	map.draw_foreground(screen, player)
+	if inventory_open:
+		inventory.draw(screen)
 	# Display
 	pygame.display.flip()
 	clock.tick(60)
