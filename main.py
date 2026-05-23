@@ -1,5 +1,5 @@
 import pygame
-import inventory, map, source, home
+import inventory, map, source, home, story
 from player import player_t
 from hotkey import hotkey_t
 
@@ -46,9 +46,15 @@ while running:
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				action = home.handle_click(event.pos)
 				if action == "start":
-					scene = "game"
+					story.load("intro")
+					scene = "story"
 				elif action == "settings":
 					scene = "settings"
+		elif scene == "story":
+			advance = (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1) or \
+				(event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN))
+			if advance and story.advance():
+				scene = "game"
 		elif scene == "settings":
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				if home.handle_settings_click(event.pos) == "back":
@@ -77,6 +83,8 @@ while running:
 			inventory.draw(screen)
 	elif scene == "home":
 		home.draw(screen)
+	elif scene == "story":
+		story.draw(screen)
 	elif scene == "settings":
 		home.draw_settings(screen)
 	# Display
