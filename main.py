@@ -1,5 +1,5 @@
 import pygame
-import inventory, map, source, base, home, story
+import inventory, map, source, base, home, story, bgm
 from player import player_t
 from hotkey import hotkey_t
 
@@ -12,6 +12,7 @@ inventory_open = False
 previous_frame_tick = 0
 
 player = player_t()
+bgm.play(bgm.MAIN_PAGE, 0.4)
 
 def check_interaction():
 	global player
@@ -53,22 +54,26 @@ while running:
 				action = home.handle_click(event.pos)
 				if action == "start":
 					story.load("intro")
+					bgm.play(bgm.CG, 0.45)
 					scene = "story"
 				elif action == "settings":
 					scene = "settings"
 		elif scene == "story":
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
 				story.skip()
+				bgm.stop()
 				scene = "game"
 				continue
 			advance = (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1) or \
 				(event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN))
 			if advance and story.advance():
+				bgm.stop()
 				scene = "game"
 		elif scene == "settings":
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				if home.handle_settings_click(event.pos) == "back":
 					scene = "home"
+					bgm.play(bgm.MAIN_PAGE, 0.4)
 		elif scene == "game":
 			if event.type == pygame.KEYDOWN:
 				for keys in hotkeys.values():
