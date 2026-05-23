@@ -6,7 +6,7 @@ from typing import Tuple
 def load_source(path: str, scale: float = 1) -> pygame.Surface:
 	img: pygame.Surface = None
 	for kind in ("jpg", "png", "jpeg"):
-		file = f"./texture/{path}.{kind}"
+		file = f"./src/img/texture/{path}.{kind}"
 		if os.path.exists(file):
 			img = pygame.image.load(file)
 			break
