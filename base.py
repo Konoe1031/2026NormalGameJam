@@ -1,4 +1,4 @@
-import pygame
+import pygame, math
 import inventory, setting, source
 
 food: int = 20
@@ -30,6 +30,15 @@ def store_resource():
 			population += slot["count"]
 		inventory.slots[i] = None
 	return
+def tick():
+	global food, population
+	food -= max(1, int(population // 10))
+	if food < 0:
+		population += food
+		food = 0
+	if food / population > .5:
+		population += math.sqrt(population) / 4
+	return
 
 def __draw_info(screen: pygame.Surface, icon: pygame.Surface, text: str, x: float, y: float):
 	screen.blit(icon, (x - setting.tile_size, y - setting.tile_size / 4))
@@ -43,7 +52,7 @@ def draw_info(screen: pygame.Surface):
 	y = setting.tile_size / 2
 	__draw_info(screen, source.foreground["clay"]["can"], f"{food}", x, y)
 	y += setting.tile_size
-	__draw_info(screen, source.foreground["lake"]["cake"], f"{population}", x, y)
+	__draw_info(screen, source.population_icon, f"{int(population)}", x, y)
 	y += setting.tile_size
 	__draw_info(screen, source.foreground["grass"]["metal"], f"{metal}", x, y)
 	y += setting.tile_size

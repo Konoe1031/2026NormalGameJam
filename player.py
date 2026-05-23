@@ -9,7 +9,7 @@ class player_t:
 		self.y = 0
 		self.facing = "down"
 		self.touch_distance = 1
-		self.state = 100
+		self.state = 0
 		self.cooldown = 0
 		self.speed_base = .125
 		self.action = None

@@ -9,6 +9,7 @@ clock = pygame.time.Clock()
 running = True
 scene = "home"
 inventory_open = False
+previous_frame_tick = 0
 
 player = player_t()
 
@@ -71,8 +72,11 @@ while running:
 			if event.type == pygame.KEYUP:
 				for keys in hotkeys.values():
 					keys.check_up(event.key)
-					
 	if scene == "game":
+		current_frame_tick = pygame.time.get_ticks() // 3000
+		if previous_frame_tick < current_frame_tick:
+			previous_frame_tick = current_frame_tick
+			base.tick()
 		player.action = None
 		if hotkeys["prevent"].pressed():
 			player.action = "prevent"
@@ -84,7 +88,6 @@ while running:
 			player.move(0, -player.speed())
 		if hotkeys["move_down"].pressed():
 			player.move(0, player.speed())
-		# Game
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
 		if inventory_open:
