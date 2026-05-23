@@ -1,10 +1,22 @@
 import pygame
+import math
 import random
 import setting, source, inventory
 from player import player_t
 from typing import Tuple
 
 home_position = (0, -1)
+virus_waves: list[dict] = []
+virus_next_times: dict[Tuple[int, int], int] = {}
+virus_speed = 0.12
+virus_radius_max = 320
+virus_width = 14
+virus_damage = 5
+
+def __next_virus_time(x: int, y: int, now: int) -> int:
+	rng = random.Random(f"virus_next({int(x)},{int(y)},{now},{setting.seed})")
+	return now + rng.randint(2500, 6500)
+
 def is_home_position(x: int, y: int) -> bool:
 	home = source.structures["home"]
 	width = (home.get_width() + setting.tile_size - 1) // setting.tile_size
@@ -39,13 +51,13 @@ def get_foreground_item_name(x: int, y: int, player: player_t) -> Tuple[str, str
 	biome = get_biome(x, y, player)
 	if biome == "home":
 		return biome, None
+	if biome not in source.foreground_dict:
+		return biome, None
 	override = source.foreground_override.get((x, y))
 	if override != None:
 		return biome, override
 	random.seed(f"fgitem({int(x)},{int(y)},{setting.seed})")
 	full = 100
-	if biome not in source.foreground_dict.keys():
-		return biome, None
 	for item in source.foreground_dict[biome].keys():
 		requirement = source.foreground_dict[biome][item]["chance"]
 		if requirement <= 0:
@@ -62,7 +74,7 @@ def get_foreground_item(x: int, y: int, player: player_t) -> pygame.Surface | No
 		return None
 	if name in source.structures:
 		return source.structures[name]
-	return source.foreground[biome].get(name)
+	return source.foreground.get(biome, {}).get(name)
 
 def draw_background(screen: pygame.Surface, player: player_t):
 	tile = source.background["grass"][0]
@@ -98,6 +110,43 @@ def __draw_home(screen: pygame.Surface, player: player_t):
 	if y > screen.get_height() or y + home.get_height() < 0:
 		return
 	screen.blit(home, (x, y))
+def __update_virus_outlet(ix: int, iy: int):
+	now = pygame.time.get_ticks()
+	key = (int(ix), int(iy))
+	next_time = virus_next_times.setdefault(key, __next_virus_time(ix, iy, now))
+	if now < next_time:
+		return
+	virus_waves.append({
+		"x": int(ix),
+		"y": int(iy),
+		"start": now,
+		"hit": False
+	})
+	virus_next_times[key] = __next_virus_time(ix, iy, now)
+
+def __draw_virus_waves(screen: pygame.Surface, player: player_t):
+	now = pygame.time.get_ticks()
+	active_waves = []
+	for wave in virus_waves:
+		age = now - wave["start"]
+		radius = age * virus_speed
+		if radius > virus_radius_max:
+			continue
+		x, y = __get_screen_position(screen, player, wave["x"], wave["y"])
+		center = (int(x + setting.tile_size / 2), int(y + setting.tile_size / 2))
+		pygame.draw.circle(screen, (80, 255, 110), center, int(radius), virus_width)
+		pygame.draw.circle(screen, (20, 120, 45), center, int(radius), 2)
+		dx = (player.x - (wave["x"] + .5)) * setting.tile_size
+		dy = (player.y - (wave["y"] + .5)) * setting.tile_size
+		distance = math.sqrt(dx * dx + dy * dy)
+		if not wave["hit"] and abs(distance - radius) <= virus_width:
+			if player.action != "prevent":
+				player.state += virus_damage
+				print(f"infected: state={player.state}")
+			wave["hit"] = True
+		active_waves.append(wave)
+	virus_waves[:] = active_waves
+
 def __draw_foreground(screen: pygame.Surface, player: player_t, ix: int, iy: int, dx: float, dy: float):
 	item = get_foreground_item(ix, iy, player)
 	if item == None:
@@ -105,6 +154,8 @@ def __draw_foreground(screen: pygame.Surface, player: player_t, ix: int, iy: int
 	y = dy - item.get_height() + setting.tile_size
 	screen.blit(item, (dx, y))
 	biome, name = get_foreground_item_name(ix, iy, player)
+	if biome == "clay" and name == "outlet":
+		__update_virus_outlet(ix, iy)
 	item_setting = source.foreground_dict.get(biome, {}).get(name)
 	if item_setting != None and item_setting["source"] and\
 		abs(ix - player.x + .5) + abs(iy - player.y + .5) <= player.touch_distance:
@@ -130,6 +181,7 @@ def draw_foreground(screen: pygame.Surface, player: player_t):
 			ix += 1
 		dy += setting.tile_size
 		iy += 1
+	__draw_virus_waves(screen, player)
 	if get_biome(player.x, player.y - 1, player) == "home" and inventory.slots[0] != None:
 		screen.blit(source.hints["e"], ((screen.get_width() - setting.tile_size) / 2, (screen.get_height() - 5 * setting.tile_size) / 2))
 	player.draw(screen)
