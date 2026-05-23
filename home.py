@@ -2,7 +2,7 @@ import pygame
 
 WIDTH, HEIGHT = 960, 720
 BTN_SCALE = 1.5
-BUTTON_SOUND = "./audio/button.mp3"
+BUTTON_SOUND = "./src/audio/button.mp3"
 
 _cover: pygame.Surface = None
 _font: pygame.font.Font = None
@@ -12,7 +12,7 @@ _click_sound: pygame.mixer.Sound | None = None
 
 
 def _place(name: str, **anchor) -> dict:
-	img = pygame.image.load(f"./button/{name}.png").convert_alpha()
+	img = pygame.image.load(f"./src/img/button/{name}.png").convert_alpha()
 	img = pygame.transform.smoothscale(img, (round(img.get_width() * BTN_SCALE), round(img.get_height() * BTN_SCALE)))
 	vis = img.get_bounding_rect()
 	screen_rect = vis.copy()
@@ -26,7 +26,7 @@ def _ensure_init():
 	global _cover, _font, _buttons, _back_button, _click_sound
 	if _cover is not None:
 		return
-	_cover = pygame.transform.scale(pygame.image.load("./cg/home_page.png"), (WIDTH, HEIGHT))
+	_cover = pygame.transform.scale(pygame.image.load("./src/img/cg/home_page.png"), (WIDTH, HEIGHT))
 	_font = pygame.font.SysFont(None, 40)
 
 	right_margin, bottom_margin, gap = 95, 60, 34

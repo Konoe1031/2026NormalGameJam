@@ -6,9 +6,9 @@ WIDTH, HEIGHT = 960, 720
 BOX_H = 200
 PAD = 40
 TYPE_SPEED = 15  # 每秒顯示的字數
-TYPING_SOUND = "./audio/typing.mp3"
+TYPING_SOUND = "./src/audio/typing.mp3"
 SOUND_START = 1.0  # 從音檔第幾秒開始播（跳過開頭靜音）
-FONT_PATH = os.path.join(os.path.dirname(__file__), "fonts", "NotoSansTC.ttf")
+FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.ttf")
 
 _font: pygame.font.Font = None
 _hint_font: pygame.font.Font = None
@@ -54,7 +54,7 @@ def _ensure_init() -> None:
 
 def load(script: str = "intro") -> None:
 	global _beats, _index
-	with open(f"./script/{script}.json", encoding="utf-8") as f:
+	with open(f"./src/script/{script}.json", encoding="utf-8") as f:
 		_beats = json.load(f)
 	_index = 0
 	_reset_typing()
@@ -93,12 +93,12 @@ def _stop_typing_sound() -> None:
 def _get_cg(name: str) -> pygame.Surface:
 	if name not in _cg_cache:
 		for ext in ("png", "jpg", "jpeg"):
-			path = f"./cg/{name}.{ext}"
+			path = f"./src/img/cg/{name}.{ext}"
 			if os.path.exists(path):
 				_cg_cache[name] = pygame.transform.scale(pygame.image.load(path), (WIDTH, HEIGHT))
 				break
 		else:
-			raise FileNotFoundError(f"story CG not found: cg/{name}.*")
+			raise FileNotFoundError(f"story CG not found: src/img/cg/{name}.*")
 	return _cg_cache[name]
 
 
