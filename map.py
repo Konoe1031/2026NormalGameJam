@@ -1,9 +1,14 @@
 import pygame
 import random
-import setting, source, player
+import setting, source
+from player import player_t
 from typing import Tuple
 
-def get_biome(x: int, y: int) -> str:
+def get_biome(x: int, y: int, player: player_t) -> str:
+	if (player.x != x or player.y != y) and player.state >= setting.player_state["void"]:
+		random.seed(f"void({int(x)},{int(y)},{setting.seed})")
+		if random.uniform(0,100) < 1:
+			return "void"
 	random.seed(f"biome({int(x)},{int(y)},{setting.seed})")
 	distance = abs(x + y + random.randint(-1, 1))
 	if distance < 50:
@@ -13,13 +18,13 @@ def get_biome(x: int, y: int) -> str:
 	if distance < 200:
 		return "lake"
 	return "ocean"
-def get_background_tile(x: int, y: int) -> pygame.Surface:
-	biome = get_biome(x, y)
+def get_background_tile(x: int, y: int, player: player_t) -> pygame.Surface:
+	biome = get_biome(x, y, player)
 	random.seed(f"bgtile({int(x)},{int(y)},{setting.seed})")
 	rand = random.randint(1, source.background_dict[biome]) - 1
 	return source.background[biome][rand]
-def get_foreground_item_name(x: int, y: int) -> Tuple[str, str | None]:
-	biome = get_biome(x, y)
+def get_foreground_item_name(x: int, y: int, player: player_t) -> Tuple[str, str | None]:
+	biome = get_biome(x, y, player)
 	override = source.foreground_override.setdefault((x, y), None)
 	if override != None:
 		return biome, override
@@ -37,13 +42,13 @@ def get_foreground_item_name(x: int, y: int) -> Tuple[str, str | None]:
 			return biome, item
 		full -= requirement
 	return biome, None
-def get_foreground_item(x: int, y: int) -> pygame.Surface | None:
-	biome, name = get_foreground_item_name(x, y)
+def get_foreground_item(x: int, y: int, player: player_t) -> pygame.Surface | None:
+	biome, name = get_foreground_item_name(x, y, player)
 	if name == None:
 		return None
 	return source.foreground[biome].setdefault(name, None)
 
-def draw_background(screen: pygame.Surface, player: player.player_t):
+def draw_background(screen: pygame.Surface, player: player_t):
 	tile = source.background["grass"][0]
 	# pivot position (the left right corner)
 	px = player.x * setting.tile_size - screen.get_width() / 2
@@ -56,26 +61,26 @@ def draw_background(screen: pygame.Surface, player: player.player_t):
 		dx = -(px % setting.tile_size)
 		ix = (px + dx) // setting.tile_size
 		while dx < screen.get_width():
-			tile = get_background_tile(ix, iy)
+			tile = get_background_tile(ix, iy, player)
 			screen.blit(tile, (dx, dy))
 			dx += setting.tile_size
 			ix += 1
 		dy += setting.tile_size
 		iy += 1
 interactable: list[Tuple[int, int]] = []
-def __draw_foreground(screen: pygame.Surface, player: player.player_t, ix: int, iy: int, dx: float, dy: float):
-	item = get_foreground_item(ix, iy)
+def __draw_foreground(screen: pygame.Surface, player: player_t, ix: int, iy: int, dx: float, dy: float):
+	item = get_foreground_item(ix, iy, player)
 	if item == None:
 		return
 	y = dy - item.get_height() + setting.tile_size
 	screen.blit(item, (dx, y))
-	biome, name = get_foreground_item_name(ix, iy)
+	biome, name = get_foreground_item_name(ix, iy, player)
 	if source.foreground_dict[biome][name]["source"] and\
 		abs(ix - player.x + .5) + abs(iy - player.y + .5) <= player.touch_distance:
 		screen.blit(source.hints["e"], (dx, dy))
 		interactable.append((ix, iy))
 	return
-def draw_foreground(screen: pygame.Surface, player: player.player_t):
+def draw_foreground(screen: pygame.Surface, player: player_t):
 	interactable.clear()
 	# pivot position (the left right corner)
 	px = player.x * setting.tile_size - screen.get_width() / 2

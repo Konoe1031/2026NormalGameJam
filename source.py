@@ -21,7 +21,8 @@ background_dict = {
 	"grass": 3,
 	"clay": 3,
 	"lake": 3,
-	"ocean": 1
+	"ocean": 1,
+	"void": 1
 }
 # [type of land][number of variant]
 background: dict[str, list[pygame.Surface]] = {}

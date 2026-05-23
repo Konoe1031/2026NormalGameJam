@@ -9,23 +9,26 @@ class player_t:
 		self.x = 0
 		self.y = 0
 		self.touch_distance = 1
-		self.state = 30
+		self.state = 50
 		self.cooldown = 0
 	def move(self, x: float, y: float):
 		self.cooldown -= 1
 		if self.cooldown > 0:
 			return self
 		if self.cooldown < -self.clock.get_fps():
-			if self.state >= setting.player_state["movability"] and random.uniform(0, 100) < self.state:
+			movability = self.state - setting.player_state["movability"]
+			if movability > 0 and random.uniform(0, 100) < movability:
 				self.cooldown = self.clock.get_fps() / 2
 			else: self.cooldown /= 3
 		# target position
 		tx, ty = self.x + x, self.y + y
-		item = map.get_foreground_item(tx // 1, ty // 1)
+		if self.state >= setting.player_state["upsidedown"]:
+			tx, ty = self.x - x, self.y - y
+		item = map.get_foreground_item(tx // 1, ty // 1, self)
 		if item != None:
 			return self
-		biome = map.get_biome(tx // 1, ty // 1)
-		if biome == "ocean":
+		biome = map.get_biome(tx // 1, ty // 1, self)
+		if biome in ("ocean", "void"):
 			return self
 		self.x, self.y = tx, ty
 		return self
