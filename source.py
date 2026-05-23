@@ -17,6 +17,10 @@ hints: dict[str, pygame.Surface] = {}
 for key in ("e"):
 	hints[key] = load_source(f"hint_{key}")
 
+structures: dict[str, pygame.Surface] = {
+	"home": load_source("home", 9)
+}
+
 background_dict = {
 	"grass": 3,
 	"clay": 3,
@@ -33,6 +37,7 @@ for land, count in background_dict.items():
 
 foreground_dict = {
 	"grass": {
+		"mango": {"chance": .1, "source": True},
 		"mango_tree": {"chance": 1, "source": True},
 		"empty_mango_tree": {"chance": 0, "source": False},
 		"plank": {"chance": 1, "source": True},

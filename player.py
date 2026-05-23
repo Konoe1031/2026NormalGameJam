@@ -33,7 +33,7 @@ class player_t:
 		if item != None:
 			return self
 		biome = map.get_biome(tx // 1, ty // 1, self)
-		if biome in ("ocean", "void"):
+		if biome in ("ocean", "home", "void"):
 			return self
 		self.action = "walk"
 		self.x, self.y = tx, ty
