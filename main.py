@@ -1,5 +1,5 @@
 import pygame
-import inventory, map, source, base, home, story, bgm
+import inventory, map, source, base, home, story, bgm, hud
 from player import player_t
 from hotkey import hotkey_t
 
@@ -99,6 +99,7 @@ while running:
 			player.move(0, player.speed())
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
+		hud.draw_player_state(screen, player)
 		if inventory_open:
 			inventory.draw(screen)
 			base.draw_info(screen)

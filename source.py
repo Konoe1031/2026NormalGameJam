@@ -18,6 +18,7 @@ for key in ("e"):
 	hints[key] = load_source(f"hint_{key}")
 
 population_icon = load_source("population")
+virus_icon = load_source("virus")
 structures: dict[str, pygame.Surface] = {
 	"home": load_source("home", 9)
 }
