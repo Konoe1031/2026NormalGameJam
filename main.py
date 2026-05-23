@@ -79,6 +79,15 @@ while running:
 			if event.type == pygame.KEYUP:
 				for keys in hotkeys.values():
 					keys.check_up(event.key)
+		elif scene == "shop":
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+				action = shop.handle_click(event.pos)
+				if action == "back":
+					scene = "game"
+					for hotkey in hotkeys.values():
+						hotkey.press = False
+				else:
+					shop.buy(player, action)
 	if scene == "game":
 		current_frame_tick = pygame.time.get_ticks() // 3000
 		if previous_frame_tick < current_frame_tick:
@@ -101,6 +110,8 @@ while running:
 			inventory.draw(screen)
 			base.draw_info(screen)
 	elif scene == "shop":
+		map.draw_background(screen, player)
+		map.draw_foreground(screen, player)
 		shop.draw(screen)
 	elif scene == "home":
 		home.draw(screen)

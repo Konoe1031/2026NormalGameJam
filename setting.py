@@ -9,3 +9,6 @@ player_state = {
 	"void": 40,
 	"upsidedown": 75
 }
+good_price = {
+	"distance": {"metal": 5, "plank": 5}
+}

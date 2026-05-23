@@ -1,64 +1,61 @@
 import pygame, math
 import inventory, setting, source
+_font: pygame.font.Font = None
 
-food: int = 20
-population: int = 10
-metal: int = 0
-plank: int = 0
-science: int = 0
-font: pygame.font.Font = None
+resource = {
+	"food": 20,
+	"population": 10,
+	"metal": 0,
+	"plank": 0,
+	"science": 0
+}
+resource_value = {
+	"metal": {"metal": 1},
+	"plank": {"plank": 1},
+	"bone": {"science": 1},
+	"drug": {"science": 3},
+	"mango": {"food": 5},
+	"can": {"food": 8},
+	"meat": {"food": 15},
+	"cake": {"food": 3, "population": 1}
+}
 
 def store_resource():
-	global food, population, metal, plank, science
+	global resource
 	for i, slot in enumerate(inventory.slots):
-		if slot == None:
-			continue
-		if slot["item"] == "metal":
-			metal += slot["count"]
-		elif slot["item"] == "plank":
-			plank += slot["count"]
-		elif slot["item"] == "bone":
-			science += slot["count"]
-		elif slot["item"] == "drug":
-			science += 3 * slot["count"]
-		elif slot["item"] == "mango":
-			food += 5 * slot["count"]
-		elif slot["item"] == "can":
-			food += 8 * slot["count"]
-		elif slot["item"] == "meat":
-			food += 12 * slot["count"]
-		elif slot["item"] == "cake":
-			food += 3 * slot["count"]
-			population += slot["count"]
+		if slot == None: continue
+		value = resource_value.get(slot["item"])
+		for kind, num in value.items():
+			resource[kind] += num * slot["count"]
 		inventory.slots[i] = None
 	return
 def tick():
-	global food, population
-	food -= max(1, int(population // 10))
-	if food < 0:
-		population += food
-		food = 0
-	if food / population > .5:
-		population += math.sqrt(population) / 4
+	global resource
+	resource["food"] -= max(1, int(resource["population"] // 10))
+	if resource["food"] < 0:
+		resource["population"] += resource["food"]
+		resource["food"] = 0
+	if resource["food"] / resource["population"] > .5:
+		resource["population"] += math.sqrt(resource["population"]) / 4
 	return
 
 def __draw_info(screen: pygame.Surface, icon: pygame.Surface, text: str, x: float, y: float):
+	global _font
+	if _font == None:
+		_font = pygame.font.SysFont(None, 48)
 	screen.blit(icon, (x - setting.tile_size, y - setting.tile_size / 4))
-	screen.blit(font.render(text, True, 0), (x, y))
+	screen.blit(_font.render(text, True, 0), (x, y))
 	return
 def draw_info(screen: pygame.Surface):
-	global food, population, metal, plank, science, font
-	if font == None:
-		font = pygame.font.SysFont(None, 48)
 	x = screen.get_width() - 2 * setting.tile_size
 	y = setting.tile_size / 2
-	__draw_info(screen, source.foreground["clay"]["can"], f"{food}", x, y)
+	__draw_info(screen, source.foreground["clay"]["can"], f"{resource['food']}", x, y)
 	y += setting.tile_size
-	__draw_info(screen, source.population_icon, f"{int(population)}", x, y)
+	__draw_info(screen, source.population_icon, f"{int(resource['population'])}", x, y)
 	y += setting.tile_size
-	__draw_info(screen, source.foreground["grass"]["metal"], f"{metal}", x, y)
+	__draw_info(screen, source.foreground["grass"]["metal"], f"{resource['metal']}", x, y)
 	y += setting.tile_size
-	__draw_info(screen, source.foreground["grass"]["plank"], f"{plank}", x, y)
+	__draw_info(screen, source.foreground["grass"]["plank"], f"{resource['plank']}", x, y)
 	y += setting.tile_size
-	__draw_info(screen, source.foreground["clay"]["drug"], f"{science}", x, y)
+	__draw_info(screen, source.foreground["clay"]["drug"], f"{resource['science']}", x, y)
 	return
