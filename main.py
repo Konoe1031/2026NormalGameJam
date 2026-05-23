@@ -9,7 +9,7 @@ screen = pygame.display.set_mode((960, 720))
 clock = pygame.time.Clock()
 running = True
 
-player = player_t()
+player = player_t(clock)
 def check_interaction():
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
