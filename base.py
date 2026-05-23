@@ -25,6 +25,8 @@ def store_resource():
 			food += 5 * slot["count"]
 		elif slot["item"] == "can":
 			food += 8 * slot["count"]
+		elif slot["item"] == "meat":
+			food += 12 * slot["count"]
 		elif slot["item"] == "cake":
 			food += 3 * slot["count"]
 			population += slot["count"]

@@ -19,7 +19,8 @@ for key in ("e"):
 
 population_icon = load_source("population")
 structures: dict[str, pygame.Surface] = {
-	"home": load_source("home", 9)
+	"home": load_source("home", 9),
+	"shop": load_source("shop", 2)
 }
 
 background_dict = {
@@ -46,13 +47,14 @@ foreground_dict = {
 		"outlet": {"chance": .05, "source": False}
 	},
 	"clay": {
-		"can": {"chance": .25, "source": True},
+		"can": {"chance": .5, "source": True},
 		"bone": {"chance": 1, "source": True},
 		"metal": {"chance": .5, "source": True},
 		"drug": {"chance": .1, "source": True},
 		"outlet": {"chance": .25, "source": False}
 	},
 	"lake": {
+		"meat": {"chance": 1, "source": True},
 		"metal": {"chance": .75, "source": True},
 		"cake": {"chance": .5, "source": True},
 		"drug": {"chance": .5, "source": True},

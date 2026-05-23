@@ -1,5 +1,5 @@
 import pygame
-import inventory, map, source, base, home, story
+import inventory, map, source, base, home, story, shop
 from player import player_t
 from hotkey import hotkey_t
 
@@ -14,9 +14,12 @@ previous_frame_tick = 0
 player = player_t()
 
 def check_interaction():
-	global player
-	if map.get_biome(player.x, player.y - 1, player) == "home":
+	global player, scene
+	biome = map.get_biome(player.x, player.y - 1, player)
+	if biome == "home":
 		base.store_resource()
+	if biome == "shop":
+		scene = "shop"
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
 		if not inventory.add_item(item):
@@ -97,6 +100,8 @@ while running:
 		if inventory_open:
 			inventory.draw(screen)
 			base.draw_info(screen)
+	elif scene == "shop":
+		shop.draw(screen)
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":
