@@ -3,7 +3,7 @@ import setting
 import os
 from typing import Tuple
 
-def load_source(path: str, scale: int = 1) -> pygame.Surface:
+def load_source(path: str, scale: float = 1) -> pygame.Surface:
 	img: pygame.Surface = None
 	for kind in ("jpg", "png", "jpeg"):
 		file = f"./texture/{path}.{kind}"
@@ -25,7 +25,8 @@ background_dict = {
 	"grass": 3,
 	"clay": 3,
 	"lake": 3,
-	"ocean": 1
+	"ocean": 1,
+	"void": 1
 }
 # [type of land][number of variant]
 background: dict[str, list[pygame.Surface]] = {}
@@ -36,18 +37,23 @@ for land, count in background_dict.items():
 
 foreground_dict = {
 	"grass": {
+		"mango": {"chance": 0, "source": True},
 		"mango_tree": {"chance": 1, "source": True},
 		"empty_mango_tree": {"chance": 0, "source": False},
 		"plank": {"chance": 1, "source": True},
-		"metal": {"chance": .05, "source": True}
+		"metal": {"chance": .05, "source": True},
+		"outlet": {"chance": .05, "source": False}
 	},
 	"clay": {
 		"can": {"chance": .25, "source": True},
 		"bone": {"chance": 1, "source": True},
-		"metal": {"chance": .5, "source": True}
+		"metal": {"chance": .5, "source": True},
+		"drug": {"chance": .25, "source": True},
+		"outlet": {"chance": .5, "source": False}
 	},
 	"lake": {
-		"cake": {"chance":.05, "source": True}
+		"cake": {"chance": 1, "source": True},
+		"outlet": {"chance": 2, "source": False}
 	}
 }
 # [type of land][type of item][chance %]
@@ -57,3 +63,14 @@ for land, content in foreground_dict.items():
 	for item in content.keys():
 		foreground[land][item] = load_source(f"{land}_{item}")
 foreground_override: dict[Tuple[int, int], str] = {}
+
+# [facing][animation]
+girl: dict[str, list[pygame.Surface]] = {
+	"fallback": [load_source("girl", 2)],
+	"left_prevent": [load_source("girl_left_prevent", 2)],
+	"right_prevent": [load_source("girl_right_prevent", 2)],
+	"up_walk": [load_source(f"girl_up_walk{i}", 2) for i in (0,1,0,2)],
+	"down_walk": [load_source(f"girl_down_walk{i}", 2) for i in (0,1,0,2)],
+	"left_walk": [load_source(f"girl_left_walk{i}", 2) for i in (0,1,0,2)],
+	"right_walk": [load_source(f"girl_right_walk{i}", 2) for i in (0,1,0,2)]
+}
