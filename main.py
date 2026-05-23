@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 running = True
 inventory_open = False
 
-player = player_t(clock)
+player = player_t()
 def check_interaction():
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
@@ -48,13 +48,13 @@ while running:
 			for keys in hotkeys.values():
 				keys.check_up(event.key)
 	if hotkeys["move_left"].pressed():
-		player.move(-.125, 0)
+		player.move(-player.speed(), 0)
 	if hotkeys["move_right"].pressed():
-		player.move(.125, 0)
+		player.move(player.speed(), 0)
 	if hotkeys["move_up"].pressed():
-		player.move(0, -.125)
+		player.move(0, -player.speed())
 	if hotkeys["move_down"].pressed():
-		player.move(0, .125)
+		player.move(0, player.speed())
 	# Game
 	map.draw_background(screen, player)
 	map.draw_foreground(screen, player)

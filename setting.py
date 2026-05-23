@@ -2,7 +2,8 @@
 seed = 9
 tile_size = 48
 player_state = {
-	"movability": 20,
-	"void": 35,
+	"unstable": 20,
+	"movability": 30,
+	"void": 40,
 	"upsidedown": 75
 }
