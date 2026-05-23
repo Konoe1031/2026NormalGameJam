@@ -1,3 +1,3 @@
 
-seed = 0
+seed = "seed"
 tile_size = 48

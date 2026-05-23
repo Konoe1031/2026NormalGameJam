@@ -1,7 +1,7 @@
 import pygame
 import random
 import setting, source, player
-from typing import Tuple
+from typing import Tuple, TYPE_CHECKING
 
 def get_biome(x: int, y: int) -> str:
 	random.seed(f"biome({int(x)},{int(y)},{setting.seed})")
@@ -41,7 +41,7 @@ def get_foreground_item(x: int, y: int) -> pygame.Surface | None:
 	biome, name = get_foreground_item_name(x, y)
 	if name == None:
 		return None
-	return source.foreground[biome][name]
+	return source.foreground[biome].setdefault(name, None)
 
 def draw_background(screen: pygame.Surface, player: player.player_t):
 	tile = source.background["grass"][0]
@@ -62,6 +62,7 @@ def draw_background(screen: pygame.Surface, player: player.player_t):
 			ix += 1
 		dy += setting.tile_size
 		iy += 1
+interactable: list[Tuple[int, int]] = []
 def __draw_foreground(screen: pygame.Surface, player: player.player_t, ix: int, iy: int, dx: float, dy: float):
 	item = get_foreground_item(ix, iy)
 	if item == None:
@@ -72,9 +73,10 @@ def __draw_foreground(screen: pygame.Surface, player: player.player_t, ix: int, 
 	if source.foreground_dict[biome][name]["source"] and\
 		abs(ix - player.x + .5) + abs(iy - player.y + .5) <= player.touch_distance:
 		screen.blit(source.hints["e"], (dx, y))
+		interactable.append((ix, iy))
 	return
 def draw_foreground(screen: pygame.Surface, player: player.player_t):
-	item: pygame.Surface = None
+	interactable.clear()
 	# pivot position (the left right corner)
 	px = player.x * setting.tile_size - screen.get_width() / 2
 	py = player.y * setting.tile_size - screen.get_height() / 2

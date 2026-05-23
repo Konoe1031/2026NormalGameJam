@@ -1,5 +1,6 @@
 import pygame
-import map, player
+import map, source
+from player import player_t
 from hotkey import hotkey_t
 from typing import Tuple
 
@@ -8,13 +9,20 @@ screen = pygame.display.set_mode((960, 720))
 clock = pygame.time.Clock()
 running = True
 
+player = player_t()
+def check_interaction():
+	for x, y in map.interactable:
+		item = source.foreground_override[x, y]
+		source.foreground_override[x, y] = f"empty_{item}"
+		print(f"you've got a {item}")
+	return
 hotkeys: dict[str, hotkey_t] = {
 	"move_left": hotkey_t([pygame.K_LEFT, pygame.K_a]),
-	"move_right": hotkey_t([ pygame.K_RIGHT, pygame.K_d ]),
-	"move_up": hotkey_t([ pygame.K_UP, pygame.K_w ]),
-	"move_down": hotkey_t([ pygame.K_DOWN, pygame.K_s ])
+	"move_right": hotkey_t([pygame.K_RIGHT, pygame.K_d]),
+	"move_up": hotkey_t([pygame.K_UP, pygame.K_w]),
+	"move_down": hotkey_t([pygame.K_DOWN, pygame.K_s]),
+	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction)
 }
-player = player.player_t()
 
 while running:
 	for event in pygame.event.get():
