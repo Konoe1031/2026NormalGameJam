@@ -29,6 +29,7 @@ DEFAULTS = {
 	"typing_speed": 15,
 	"key_inventory": pygame.K_TAB,
 	"key_settings": pygame.K_ESCAPE,
+	"tutorial_done": False,
 	"key_prevent": pygame.K_LSHIFT,
 }
 
@@ -41,6 +42,7 @@ tile_size = DEFAULTS["tile_size"]
 typing_speed = DEFAULTS["typing_speed"]
 key_inventory = DEFAULTS["key_inventory"]
 key_settings = DEFAULTS["key_settings"]
+tutorial_done = DEFAULTS["tutorial_done"]
 key_prevent = DEFAULTS["key_prevent"]
 
 seed = configured_seed
