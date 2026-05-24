@@ -67,3 +67,31 @@ def try_skip(key) -> bool:
 		_finish()
 		return True
 	return False
+
+
+def _cjk_font(size: int) -> pygame.font.Font:
+	if os.path.exists(FONT_PATH):
+		return pygame.font.Font(FONT_PATH, size)
+	return pygame.font.SysFont(None, size)
+
+
+def _ensure_fonts():
+	global _font, _hint_font
+	if _font is None:
+		_font = _cjk_font(28)
+		_hint_font = _cjk_font(20)
+
+
+def draw(screen: pygame.Surface):
+	if not active():
+		return
+	_ensure_fonts()
+	box_h = 60
+	top = HEIGHT - 195
+	box = pygame.Surface((WIDTH, box_h), pygame.SRCALPHA)
+	box.fill((20, 20, 20, 180))
+	screen.blit(box, (0, top))
+	text = _STEPS[_index]["text"]
+	screen.blit(_font.render(text, True, (245, 245, 245)), (40, top + 16))
+	hint = _hint_font.render("按 H 跳過教學", True, (200, 200, 200))
+	screen.blit(hint, hint.get_rect(bottomright=(WIDTH - 24, top + box_h - 8)))
