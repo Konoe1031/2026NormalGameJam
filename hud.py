@@ -12,6 +12,7 @@ BAR_Y = Y + 16
 BAR_WIDTH = 320
 BAR_HEIGHT = 46
 MAX_STATE = 100
+FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.ttf")
 
 SETTINGS_ICON = os.path.join(os.path.dirname(__file__), "src", "img", "button", "setting_icon.png")
 CLICK_SOUND = os.path.join(os.path.dirname(__file__), "src", "audio", "button.mp3")
@@ -21,6 +22,36 @@ SETTINGS_ICON_POS = (16, 16)
 _settings_btn = None
 _click_sound = None
 _click_loaded = False
+_state_font: pygame.font.Font | None = None
+_state_hint_font: pygame.font.Font | None = None
+_last_state_keys: set[str] = set()
+_state_hint_until = 0
+_state_hint_title = ""
+_state_hint_text = ""
+STATE_HINT_DURATION = 3200
+
+STATE_HINTS = [
+	("unstable", "不穩定", "移動速度開始忽快忽慢。"),
+	("movability", "行動受阻", "移動時有機率短暫僵住。"),
+	("blind", "視野受阻", "遮罩會覆蓋畫面，視野變得有限。"),
+	("void", "空洞幻覺", "遠離腳下的位置可能出現無法通行的空洞。"),
+	("elmo", "異變獵物", "地圖上開始出現新的可採集生物。"),
+	("upsidedown", "方向錯亂", "移動方向會上下左右顛倒。"),
+]
+
+
+def _cjk_font(size: int) -> pygame.font.Font:
+	if os.path.exists(FONT_PATH):
+		return pygame.font.Font(FONT_PATH, size)
+	return pygame.font.SysFont(None, size)
+
+
+def _ensure_state_fonts():
+	global _state_font, _state_hint_font
+	if _state_font is None:
+		_state_font = _cjk_font(20)
+	if _state_hint_font is None:
+		_state_hint_font = _cjk_font(16)
 
 
 def _ensure_settings_button():
@@ -82,8 +113,43 @@ def _jitter_points(points: list[tuple[int, int]]) -> list[tuple[int, int]]:
 	return result
 
 
+def _update_state_hint(state_value: float):
+	global _last_state_keys, _state_hint_until, _state_hint_title, _state_hint_text
+	active = {
+		key
+		for key, _, _ in STATE_HINTS
+		if state_value >= setting.player_state[key]
+	}
+	new_keys = active - _last_state_keys
+	if new_keys:
+		for key, label, hint in reversed(STATE_HINTS):
+			if key in new_keys:
+				_state_hint_title = label
+				_state_hint_text = hint
+				_state_hint_until = pygame.time.get_ticks() + STATE_HINT_DURATION
+				break
+	_last_state_keys = active
+
+
+def _draw_state_hint(screen: pygame.Surface):
+	_ensure_state_fonts()
+	if pygame.time.get_ticks() >= _state_hint_until:
+		return
+	x = BAR_X
+	y = BAR_Y - 54
+	shadow = (20, 24, 22)
+	main = (232, 255, 236)
+	sub = (190, 235, 200)
+	screen.blit(_state_font.render(f"新症狀：{_state_hint_title}", True, shadow), (x + 1, y + 1))
+	screen.blit(_state_font.render(f"新症狀：{_state_hint_title}", True, main), (x, y))
+	screen.blit(_state_hint_font.render(_state_hint_text, True, shadow), (x + 1, y + 27))
+	screen.blit(_state_hint_font.render(_state_hint_text, True, sub), (x, y + 26))
+
+
 def draw_player_state(screen: pygame.Surface, player):
-	value = max(0, min(player.get_state(), MAX_STATE)) / MAX_STATE
+	state_value = player.get_state()
+	_update_state_hint(state_value)
+	value = max(0, min(state_value, MAX_STATE)) / MAX_STATE
 	layer = pygame.Surface((BAR_X + BAR_WIDTH + 24, Y + ICON_SIZE + 12), pygame.SRCALPHA)
 
 	jump_interval = 2800 - int((value ** 1.7) * 1300)
@@ -148,3 +214,4 @@ def draw_player_state(screen: pygame.Surface, player):
 
 	layer.set_alpha(225)
 	screen.blit(layer, (0, 0))
+	_draw_state_hint(screen)
