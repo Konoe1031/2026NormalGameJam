@@ -1,5 +1,5 @@
 import pygame, random
-import inventory, map, source, base, home, story, shop, bgm, hud
+import inventory, map, source, base, home, story, shop, bgm, hud, tutorial
 import setting, settings_page
 from player import player_t
 from hotkey import hotkey_t
@@ -40,6 +40,8 @@ def enter_game():
 	global scene
 	bgm.play(bgm.MAIN_GAME, 0.38)
 	scene = "game"
+	if not setting.tutorial_done:
+		tutorial.start(player)
 def enter_bad_virus_ending():
 	global scene
 	story.load("bad_virus")
@@ -113,8 +115,10 @@ def check_interaction():
 		if storage_sound != None:
 			storage_sound.play()
 		base.store_resource()
+		tutorial.notify("store")
 	if biome == "shop":
 		scene = "shop"
+		tutorial.notify("shop")
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
 		if not inventory.add_item(item):
@@ -126,10 +130,12 @@ def check_interaction():
 		if pickup_sound != None:
 			pickup_sound.play()
 		source.foreground_override[x, y] = f"empty_{item}"
+		tutorial.notify("pickup")
 	return
 def open_inventory():
 	global inventory_open
 	inventory_open = True
+	tutorial.notify("inventory")
 	return
 def close_inventory():
 	global inventory_open
@@ -192,15 +198,19 @@ while running:
 				if scene == "home":
 					bgm.play(bgm.MAIN_PAGE, 0.4)
 		elif scene == "game":
+			if event.type == pygame.KEYDOWN and tutorial.try_skip(event.key):
+				continue
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and hud.settings_button_clicked(event.pos):
 				settings_return_scene = "game"
 				settings_ui.enter()
 				scene = "settings"
+				tutorial.notify("settings")
 				continue
 			if event.type == pygame.KEYDOWN and event.key == setting.key_settings:
 				settings_return_scene = "game"
 				settings_ui.enter()
 				scene = "settings"
+				tutorial.notify("settings")
 				continue
 			if event.type == pygame.KEYDOWN:
 				for keys in hotkeys.values():
@@ -255,6 +265,8 @@ while running:
 			player.move(0, -player.speed())
 		if hotkeys["move_down"].pressed():
 			player.move(0, player.speed())
+		if tutorial.active():
+			tutorial.update(player)
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
 		map.draw_blind_mask(screen, player)
@@ -265,6 +277,7 @@ while running:
 			base.draw_info(screen)
 		map.draw_virus_flash(screen)
 		hud.draw_settings_button(screen)
+		tutorial.draw(screen)
 	elif scene == "shop":
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
