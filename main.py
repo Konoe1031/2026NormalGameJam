@@ -112,7 +112,7 @@ while running:
 	elif scene == "shop":
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
-		shop.draw(screen)
+		shop.draw(screen, player)
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":

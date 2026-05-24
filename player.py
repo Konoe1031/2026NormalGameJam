@@ -13,6 +13,9 @@ class player_t:
 		self.cooldown = 0
 		self.speed_base = .125
 		self.action = None
+		self.upgrade = {
+			"distance": 0
+		}
 	def move(self, x: float, y: float):
 		if y > 0: self.facing = "down"
 		if y < 0: self.facing = "up"

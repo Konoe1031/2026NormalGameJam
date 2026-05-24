@@ -2,6 +2,8 @@ import pygame, math
 import inventory, setting, source
 _font: pygame.font.Font = None
 
+population_limit = 30
+food_decrease_ratio = 10
 resource = {
 	"food": 20,
 	"population": 10,
@@ -31,12 +33,14 @@ def store_resource():
 	return
 def tick():
 	global resource
-	resource["food"] -= max(1, int(resource["population"] // 10))
+	resource["food"] -= max(1, int(resource["population"] // food_decrease_ratio))
 	if resource["food"] < 0:
 		resource["population"] += resource["food"]
 		resource["food"] = 0
 	if resource["food"] / resource["population"] > .5:
 		resource["population"] += math.sqrt(resource["population"]) / 4
+		if population_limit < resource["population"]:
+			resource["population"] = population_limit
 	return
 
 def __draw_info(screen: pygame.Surface, icon: pygame.Surface, text: str, x: float, y: float):
@@ -49,13 +53,7 @@ def __draw_info(screen: pygame.Surface, icon: pygame.Surface, text: str, x: floa
 def draw_info(screen: pygame.Surface):
 	x = screen.get_width() - 2 * setting.tile_size
 	y = setting.tile_size / 2
-	__draw_info(screen, source.foreground["clay"]["can"], f"{resource['food']}", x, y)
-	y += setting.tile_size
-	__draw_info(screen, source.population_icon, f"{int(resource['population'])}", x, y)
-	y += setting.tile_size
-	__draw_info(screen, source.foreground["grass"]["metal"], f"{resource['metal']}", x, y)
-	y += setting.tile_size
-	__draw_info(screen, source.foreground["grass"]["plank"], f"{resource['plank']}", x, y)
-	y += setting.tile_size
-	__draw_info(screen, source.foreground["clay"]["drug"], f"{resource['science']}", x, y)
+	for kind in ("food", "population", "metal", "plank", "science"):
+		__draw_info(screen, source.resource[kind], f"{int(resource[kind])}", x, y)
+		y += setting.tile_size
 	return

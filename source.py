@@ -17,7 +17,6 @@ hints: dict[str, pygame.Surface] = {}
 for key in ("e"):
 	hints[key] = load_source(f"hint_{key}")
 
-population_icon = load_source("population")
 structures: dict[str, pygame.Surface] = {
 	"home": load_source("home", 9),
 	"shop": load_source("shop", 2)
@@ -78,4 +77,12 @@ girl: dict[str, list[pygame.Surface]] = {
 	"down_walk": [load_source(f"girl_down_walk{i}", 2) for i in (0,1,0,2)],
 	"left_walk": [load_source(f"girl_left_walk{i}", 2) for i in (0,1,0,2)],
 	"right_walk": [load_source(f"girl_right_walk{i}", 2) for i in (0,1,0,2)]
+}
+
+resource: dict[str, pygame.Surface] = {
+	"food": load_source("clay_can"),
+	"population": load_source("population"),
+	"metal": load_source("grass_metal"),
+	"plank": load_source("grass_plank"),
+	"science": load_source("clay_drug")
 }
