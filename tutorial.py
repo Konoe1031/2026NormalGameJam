@@ -7,11 +7,11 @@ FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.
 SKIP_KEY = pygame.K_h
 
 _STEPS = [
-	{"signal": "move", "text": "用 WASD 或方向鍵移動看看"},
+	{"signal": "move", "text": "用 WASD 或方向鍵移動看看，按下 shift 可以屏氣躲避毒氣"},
 	{"signal": "pickup", "text": "靠近任何一個物件，按 E 撿取看看"},
-	{"signal": "inventory", "text": "按 TAB 打開背包：中央是攜帶物，右上角是倉庫"},
-	{"signal": "store", "text": "回倉庫旁按 E 把東西存進倉庫，才能用來升級"},
-	{"signal": "shop", "text": "走到商店旁按 E，可以在這裡升級"},
+	{"signal": "inventory", "text": "按 TAB 打開背包：中央是攜帶物，右上角是倉庫，可把撿拾的物品放進"},
+	{"signal": "store", "text": "回倉庫旁按 E 把東西存進倉庫，可以在商店裡用倉庫裡的東西升級"},
+	{"signal": "shop", "text": "走到商店旁按 E，可以在這裡升級基地和自己本身"},
 	{"signal": "settings", "text": "點左上角的齒輪可以打開設定"},
 ]
 
