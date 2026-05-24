@@ -143,6 +143,11 @@ while running:
 				if scene == "home":
 					bgm.play(bgm.MAIN_PAGE, 0.4)
 		elif scene == "game":
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and hud.settings_button_clicked(event.pos):
+				settings_return_scene = "game"
+				settings_ui.enter()
+				scene = "settings"
+				continue
 			if event.type == pygame.KEYDOWN and event.key == setting.key_settings:
 				settings_return_scene = "game"
 				settings_ui.enter()
@@ -189,6 +194,7 @@ while running:
 			inventory.draw(screen)
 			base.draw_info(screen)
 		map.draw_virus_flash(screen)
+		hud.draw_settings_button(screen)
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":
