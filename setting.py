@@ -6,9 +6,10 @@ shop_position = (4, 3)
 player_state = {
 	"unstable": 20,
 	"movability": 30,
-	"elmo": 65,
-	"void": 40,
-	"upsidedown": 75
+	"blind": 40,
+	"void": 60,
+	"elmo": 70,
+	"upsidedown": 80
 }
 good_price = {
 	"distance": [{"metal": 5, "plank": 5}, {"metal": 10, "plank": 10}, {"metal": 10, "plank": 10}, None],
