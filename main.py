@@ -56,7 +56,7 @@ def enter_real_ending():
 	scene = "ending"
 
 def reached_escape_resources() -> bool:
-	return base.population > 50 and base.metal > 50 and base.plank > 50
+	return base.resource["population"] > 50 and base.resource["metal"] > 50 and base.resource["plank"] > 50
 
 def check_interaction():
 	global player, scene
@@ -149,7 +149,7 @@ while running:
 		if player.state > 100:
 			enter_bad_virus_ending()
 			continue
-		if base.population <= 0:
+		if base.resource["population"] < 2:
 			enter_bad_population_ending()
 			continue
 		if reached_escape_resources():
