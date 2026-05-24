@@ -13,9 +13,11 @@ class player_t:
 		self.cooldown = 0
 		self.speed_base = .125
 		self.action = None
-		self.upgrade = {
-			"distance": 0
-		}
+		self.upgrade = {}
+	def get_state(self):
+		if self.upgrade.get("resistance") != None:
+			return max(self.state / 2, self.state - 30)
+		return self.state
 	def move(self, x: float, y: float):
 		if y > 0: self.facing = "down"
 		if y < 0: self.facing = "up"

@@ -23,7 +23,7 @@ def _jitter_points(points: list[tuple[int, int]]) -> list[tuple[int, int]]:
 
 
 def draw_player_state(screen: pygame.Surface, player):
-	value = max(0, min(player.state, MAX_STATE)) / MAX_STATE
+	value = max(0, min(player.get_state(), MAX_STATE)) / MAX_STATE
 	layer = pygame.Surface((BAR_X + BAR_WIDTH + 24, Y + ICON_SIZE + 12), pygame.SRCALPHA)
 
 	jump_interval = 2800 - int((value ** 1.7) * 1300)

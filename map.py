@@ -37,7 +37,7 @@ def get_biome(x: int, y: int, player: player_t) -> str:
 		return "home"
 	if is_shop_position(x, y):
 		return "shop"
-	if (player.x // 1 != x or player.y // 1 != y) and player.state >= setting.player_state["void"]:
+	if (player.x // 1 != x or player.y // 1 != y) and player.get_state() >= setting.player_state["void"]:
 		random.seed(f"void({int(x)},{int(y)},{setting.seed})")
 		if random.uniform(0, 100) < 1:
 			return "void"
@@ -163,7 +163,7 @@ def __draw_virus_waves(screen: pygame.Surface, player: player_t):
 			if player.action != "prevent":
 				player.state += virus_damage
 				virus_flash_until = now + virus_flash_duration
-				print(f"infected: state={player.state}")
+				print(f"infected: state={player.get_state()}")
 			wave["hit"] = True
 		active_waves.append(wave)
 	virus_waves[:] = active_waves

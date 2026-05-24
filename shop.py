@@ -43,7 +43,14 @@ def _ensure_init():
 	speed = pygame.image.load(f"./src/img/texture/speed_upgrade.png")
 	speed = pygame.transform.scale(speed, GOOD_SIZE).convert_alpha()
 	speed = _place(speed, topleft=(dx, dy))
-	goods = {"restaurant": restaurant, "lab": lab, "house": house, "distance": distance, "speed": speed}
+	dx += WIDTH * 4 / 16
+	resistance = pygame.image.load(f"./src/img/texture/resistance_upgrade.png")
+	resistance = pygame.transform.scale(resistance, GOOD_SIZE).convert_alpha()
+	resistance = _place(resistance, topleft=(dx, dy))
+	goods = {
+		"restaurant": restaurant, "lab": lab, "house": house,
+		"distance": distance, "speed": speed, "resistance": resistance
+	}
 def handle_click(pos: tuple[int, int]) -> str | None:
 	_ensure_init()
 	if back_btn["rect"].collidepoint(pos):
