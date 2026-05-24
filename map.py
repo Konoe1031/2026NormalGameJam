@@ -185,7 +185,7 @@ def __draw_foreground(screen: pygame.Surface, player: player_t, ix: int, iy: int
 	y = dy - item.get_height() + setting.tile_size
 	screen.blit(item, (dx, y))
 	biome, name = get_foreground_item_name(ix, iy, player)
-	if( biome == "clay" or biome == "grass")and name == "outlet":
+	if name == "outlet":
 		__update_virus_outlet(ix, iy)
 	item_setting = source.foreground_dict.get(biome, {}).get(name)
 	if item_setting != None and item_setting["source"] and\

@@ -58,6 +58,7 @@ foreground_dict = {
 		"metal": {"chance": .75, "source": True},
 		"cake": {"chance": .5, "source": True},
 		"drug": {"chance": .5, "source": True},
+		"plank": {"chance": .5, "source": True},
 		"outlet": {"chance": 1, "source": False}
 	}
 }

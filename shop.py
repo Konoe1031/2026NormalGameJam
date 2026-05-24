@@ -27,13 +27,13 @@ def _ensure_init():
 	restaurant = pygame.transform.scale(restaurant, GOOD_SIZE).convert_alpha()
 	restaurant = _place(restaurant, topleft=(dx, dy))
 	dx += WIDTH * 4 / 16
-	lab = pygame.image.load(f"./src/img/texture/lab_upgrade.png")
-	lab = pygame.transform.scale(lab, GOOD_SIZE).convert_alpha()
-	lab = _place(lab, topleft=(dx, dy))
-	dx += WIDTH* 4 / 16
 	house = pygame.image.load(f"./src/img/texture/house_upgrade.png")
 	house = pygame.transform.scale(house, GOOD_SIZE).convert_alpha()
 	house = _place(house, topleft=(dx, dy))
+	dx += WIDTH* 4 / 16
+	lab = pygame.image.load(f"./src/img/texture/lab_upgrade.png")
+	lab = pygame.transform.scale(lab, GOOD_SIZE).convert_alpha()
+	lab = _place(lab, topleft=(dx, dy))
 	dx = WIDTH * 7 / 32
 	dy += HEIGHT * 6 / 16
 	distance = pygame.image.load(f"./src/img/texture/distance_upgrade.png")
