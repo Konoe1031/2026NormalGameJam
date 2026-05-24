@@ -175,6 +175,7 @@ while running:
 			player.move(0, player.speed())
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
+		map.draw_blind_mask(screen, player)
 		hud.draw_player_state(screen, player)
 		if inventory_open:
 			inventory.draw(screen)

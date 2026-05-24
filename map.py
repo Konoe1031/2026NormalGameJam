@@ -15,6 +15,10 @@ virus_flash_until = 0
 virus_flash_duration = 220
 virus_wave_sound_path = "./src/audio/virus_wave.mp3"
 virus_wave_sound: pygame.mixer.Sound | None = None
+blind_mask_path = "./src/img/texture/mask.webp"
+blind_mask: pygame.Surface | None = None
+blind_mask_scaled: pygame.Surface | None = None
+blind_mask_size: Tuple[int, int] | None = None
 
 def __play_virus_wave_sound():
 	global virus_wave_sound
@@ -32,6 +36,22 @@ def __play_virus_wave_sound():
 			print(f"virus_wave: failed to load {virus_wave_sound_path}: {e}")
 			return
 	virus_wave_sound.play()
+
+def draw_blind_mask(screen: pygame.Surface, player: player_t):
+	global blind_mask, blind_mask_scaled, blind_mask_size
+	if player.state < setting.player_state["blind"]:
+		return
+	if blind_mask == None:
+		try:
+			blind_mask = pygame.image.load(blind_mask_path).convert_alpha()
+		except pygame.error as e:
+			print(f"blind: failed to load {blind_mask_path}: {e}")
+			return
+	screen_size = screen.get_size()
+	if blind_mask_scaled == None or blind_mask_size != screen_size:
+		blind_mask_scaled = pygame.transform.smoothscale(blind_mask, screen_size)
+		blind_mask_size = screen_size
+	screen.blit(blind_mask_scaled, (0, 0))
 
 def __next_virus_time(x: int, y: int, now: int) -> int:
 	rng = random.Random(f"virus_next({int(x)},{int(y)},{now},{setting.seed})")
