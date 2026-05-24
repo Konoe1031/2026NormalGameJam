@@ -13,6 +13,25 @@ virus_width = 14
 virus_damage = 5
 virus_flash_until = 0
 virus_flash_duration = 220
+virus_wave_sound_path = "./src/audio/virus_wave.mp3"
+virus_wave_sound: pygame.mixer.Sound | None = None
+
+def __play_virus_wave_sound():
+	global virus_wave_sound
+	if not pygame.mixer.get_init():
+		try:
+			pygame.mixer.init()
+		except pygame.error as e:
+			print(f"virus_wave: mixer init failed: {e}")
+			return
+	if virus_wave_sound == None:
+		try:
+			virus_wave_sound = pygame.mixer.Sound(virus_wave_sound_path)
+			virus_wave_sound.set_volume(0.75)
+		except pygame.error as e:
+			print(f"virus_wave: failed to load {virus_wave_sound_path}: {e}")
+			return
+	virus_wave_sound.play()
 
 def __next_virus_time(x: int, y: int, now: int) -> int:
 	rng = random.Random(f"virus_next({int(x)},{int(y)},{now},{setting.seed})")
@@ -163,6 +182,7 @@ def __draw_virus_waves(screen: pygame.Surface, player: player_t):
 			if player.action != "prevent":
 				player.state += virus_damage
 				virus_flash_until = now + virus_flash_duration
+				__play_virus_wave_sound()
 				print(f"infected: state={player.state}")
 			wave["hit"] = True
 		active_waves.append(wave)

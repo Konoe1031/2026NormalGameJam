@@ -6,7 +6,8 @@ shop_position = (4, 3)
 player_state = {
 	"unstable": 20,
 	"movability": 30,
-	"void": 40,
+    "blind":40,
+	"void": 60,
 	"upsidedown": 75
 }
 good_price = {
