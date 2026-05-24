@@ -3,7 +3,6 @@ import setting
 import os
 from typing import Tuple
 
-# 原圖快取：避免每次 rescale 都重新從磁碟讀取（拖曳視野滑桿會頻繁觸發）
 _image_cache: dict[str, pygame.Surface] = {}
 
 def load_source(path: str, scale: float = 1) -> pygame.Surface:

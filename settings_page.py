@@ -24,7 +24,6 @@ class Slider:
 	def _quantize(self, v):
 		v = max(self.vmin, min(self.vmax, v))
 		steps = round((v - self.vmin) / self.step)
-		# round 收掉浮點誤差，確保邊界值精確（下游有 == 1.0 / == 0.0 的判斷）
 		return round(self.vmin + steps * self.step, 10)
 
 	def set_from_x(self, mouse_x, track_x, track_w):
@@ -48,7 +47,7 @@ class TextInput:
 				self.value = self.value[:-1]
 				return True
 			return False
-		ch = event.unicode  # 非字元鍵（方向鍵、F 鍵等）的 unicode 為空字串
+		ch = event.unicode
 		if ch and ch.isprintable() and len(self.value) < self.max_len:
 			self.value += ch
 			return True
@@ -63,14 +62,12 @@ class KeyCapture:
 		self.capturing = True
 
 	def take(self, event):
-		"""捕捉中收到 KEYDOWN 時回傳鍵碼並結束捕捉，否則 None。"""
 		if not self.capturing:
 			return None
 		self.capturing = False
 		return event.key
 
 
-# 版面常數
 PANEL = pygame.Rect(180, 70, 600, 580)
 LABEL_X = 220
 TRACK_X = 470
@@ -94,7 +91,6 @@ class SettingsPage:
 		self._hint = _cjk_font(20)
 		self._sliders = {"sfx": self.sfx, "music": self.music, "view": self.view, "typing": self.typing}
 
-	# --- 幾何 ---
 	def _row_y(self, index):
 		return FIRST_Y + index * ROW_H
 
@@ -115,7 +111,6 @@ class SettingsPage:
 		r = self._back_rect()
 		return r.centerx, r.centery
 
-	# --- 套用 ---
 	def _apply(self):
 		setting.sfx_volume = self.sfx.value
 		setting.music_volume = self.music.value
@@ -131,7 +126,6 @@ class SettingsPage:
 		other = setting.key_settings if which == "inv" else setting.key_inventory
 		return key == other
 
-	# --- 事件 ---
 	def handle_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 			return self._on_mouse_down(event.pos)
@@ -145,7 +139,6 @@ class SettingsPage:
 					s.set_from_x(event.pos[0], tx, tw)
 					self._apply()
 		if event.type == pygame.KEYDOWN:
-			# 閒置時按 ESC 等同「返回」；捕捉鍵或輸入種子時，ESC 交給 _on_key_down 處理
 			if event.key == pygame.K_ESCAPE and not self.key_inv.capturing \
 				and not self.key_set.capturing and not self.seed.focused:
 				return "back"
@@ -162,7 +155,6 @@ class SettingsPage:
 			return "back"
 		for name, s in self._sliders.items():
 			tx, cy, tw = self.slider_track(name)
-			# Rect 右緣為排他，+1 讓點在最右端 (tx+tw) 仍命中
 			track = pygame.Rect(tx, cy - 12, tw + 1, 24)
 			if track.collidepoint(pos):
 				self._defocus()
@@ -207,7 +199,6 @@ class SettingsPage:
 		if self.seed.focused and self.seed.handle_key(event):
 			self._apply()
 
-	# --- 繪製 ---
 	def draw(self, screen):
 		panel = pygame.Surface((PANEL.width, PANEL.height), pygame.SRCALPHA)
 		panel.fill((20, 24, 32, 200))
