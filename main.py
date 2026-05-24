@@ -32,6 +32,9 @@ def start_new_game():
 	map.reset()
 	source.reset_runtime_state()
 	setting.seed = setting.configured_seed
+	inventory.maximum_slot = 5
+	for hotkey in hotkeys.values():
+		hotkey.press = False
 
 def enter_game():
 	global scene
