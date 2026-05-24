@@ -2,7 +2,7 @@ import pygame, math
 import inventory, setting, source
 _font: pygame.font.Font = None
 
-population_limit = 30
+population_limit = 30.1
 food_decrease_ratio = 10
 resource = {
 	"food": 20,
@@ -43,7 +43,7 @@ def tick():
 		return
 	if resource["food"] / resource["population"] > .5:
 		resource["population"] += math.sqrt(resource["population"]) / 4
-		if population_limit < resource["population"]:
+		if resource["population"] > population_limit:
 			resource["population"] = population_limit
 	return
 
