@@ -64,6 +64,7 @@ foreground_dict = {
 foreground_override: dict[Tuple[int, int], str] = {}
 
 hints: dict[str, pygame.Surface] = {}
+arrow_icon: pygame.Surface | None = None
 population_icon: pygame.Surface | None = None
 virus_icon: pygame.Surface | None = None
 structures: dict[str, pygame.Surface] = {}
@@ -72,14 +73,18 @@ foreground: dict[str, dict[str, pygame.Surface]] = {}
 girl: dict[str, list[pygame.Surface]] = {}
 resource: dict[str, pygame.Surface] = {}
 
+def reset_runtime_state() -> None:
+	foreground_override.clear()
+
 
 def build() -> None:
-	global hints, population_icon, virus_icon, structures, background, foreground, girl, resource
+	global hints, arrow_icon, population_icon, virus_icon, structures, background, foreground, girl, resource
 
 	hints = {}
 	for key in ("e",):
 		hints[key] = load_source(f"hint_{key}")
 
+	arrow_icon = load_source("arrow", 1.4)
 	population_icon = load_source("population")
 	virus_icon = load_source("virus")
 	structures = {

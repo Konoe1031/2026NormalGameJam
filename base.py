@@ -2,15 +2,18 @@ import pygame, math
 import inventory, setting, source
 _font: pygame.font.Font = None
 
-population_limit = 30.1
-food_decrease_ratio = 10
-resource = {
+INITIAL_POPULATION_LIMIT = 30.1
+INITIAL_FOOD_DECREASE_RATIO = 10
+INITIAL_RESOURCE = {
 	"food": 20,
 	"population": 10,
 	"metal": 0,
 	"plank": 0,
 	"science": 0
 	}
+population_limit = INITIAL_POPULATION_LIMIT
+food_decrease_ratio = INITIAL_FOOD_DECREASE_RATIO
+resource = INITIAL_RESOURCE.copy()
 resource_value = {
 	"metal": {"metal": 1},
 	"plank": {"plank": 1},
@@ -22,6 +25,12 @@ resource_value = {
 	"good_meat": {"food": 1, "science": .5},
 	"cake": {"food": 3, "population": 1}
 }
+
+def reset():
+	global population_limit, food_decrease_ratio, resource
+	population_limit = INITIAL_POPULATION_LIMIT
+	food_decrease_ratio = INITIAL_FOOD_DECREASE_RATIO
+	resource = INITIAL_RESOURCE.copy()
 
 def store_resource():
 	global resource

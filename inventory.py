@@ -11,6 +11,10 @@ MAX_STACK = 7
 
 slots: list[dict[str, str | int] | None] = [None] * SLOT_COUNT
 
+def reset():
+	global slots
+	slots = [None] * SLOT_COUNT
+
 def add_item(item: str) -> bool:
 	if item == "mango_tree":
 		item = "mango"
