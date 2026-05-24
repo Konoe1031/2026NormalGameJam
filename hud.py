@@ -1,3 +1,4 @@
+import os
 import pygame
 import math
 import setting
@@ -11,6 +12,65 @@ BAR_Y = Y + 16
 BAR_WIDTH = 320
 BAR_HEIGHT = 46
 MAX_STATE = 100
+
+SETTINGS_ICON = os.path.join(os.path.dirname(__file__), "src", "img", "button", "setting_icon.png")
+CLICK_SOUND = os.path.join(os.path.dirname(__file__), "src", "audio", "button.mp3")
+SETTINGS_ICON_SCALE = 0.8
+SETTINGS_ICON_POS = (16, 16)
+
+_settings_btn = None
+_click_sound = None
+_click_loaded = False
+
+
+def _ensure_settings_button():
+	global _settings_btn
+	if _settings_btn is not None:
+		return
+	img = pygame.image.load(SETTINGS_ICON).convert_alpha()
+	img = pygame.transform.smoothscale(img, (round(img.get_width() * SETTINGS_ICON_SCALE), round(img.get_height() * SETTINGS_ICON_SCALE)))
+	vis = img.get_bounding_rect()
+	rect = vis.copy()
+	rect.topleft = SETTINGS_ICON_POS
+	_settings_btn = {"img": img, "pos": (rect.x - vis.x, rect.y - vis.y), "rect": rect}
+
+
+def _ensure_click():
+	global _click_sound, _click_loaded
+	if _click_loaded:
+		return
+	_click_loaded = True
+	if not pygame.mixer.get_init():
+		try:
+			pygame.mixer.init()
+		except pygame.error as e:
+			print(f"hud: 音訊初始化失敗：{e}")
+			return
+	try:
+		_click_sound = pygame.mixer.Sound(CLICK_SOUND)
+		setting.register_sfx(_click_sound)
+	except pygame.error as e:
+		print(f"hud: 載入 {CLICK_SOUND} 失敗：{e}")
+
+
+def draw_settings_button(screen: pygame.Surface):
+	_ensure_settings_button()
+	img, pos, rect = _settings_btn["img"], _settings_btn["pos"], _settings_btn["rect"]
+	if rect.collidepoint(pygame.mouse.get_pos()):
+		big = pygame.transform.smoothscale(img, (round(img.get_width() * 1.08), round(img.get_height() * 1.08)))
+		screen.blit(big, big.get_rect(center=img.get_rect(topleft=pos).center))
+	else:
+		screen.blit(img, pos)
+
+
+def settings_button_clicked(pos) -> bool:
+	_ensure_settings_button()
+	if _settings_btn["rect"].collidepoint(pos):
+		_ensure_click()
+		if _click_sound is not None:
+			_click_sound.play()
+		return True
+	return False
 
 
 def _jitter_points(points: list[tuple[int, int]]) -> list[tuple[int, int]]:
