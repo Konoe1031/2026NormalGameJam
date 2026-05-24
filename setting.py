@@ -11,8 +11,8 @@ player_state = {
 }
 good_price = {
 	"distance": [{"metal": 5, "plank": 5}, {"metal": 10, "plank": 10}, {"metal": 10, "plank": 10}, None],
-	"speed": [{"science": 5, "food": 5}, {"science": 10, "population": 3}, None],
-	"restaurant": [{"population": 2}, {"population": 5}, {"population": 10}, None],
-	"lab": [{"science": 5}, {"science": 10, "metal": 3}, {"science": 15, "population": 3}, None],
+	"speed": [{"science": 5, "food": 5}, {"science": 15, "food": 10}, None],
+	"restaurant": [{"fodd": 5}, {"food": 10}, {"food": 20}, {"food": 40}, None],
+	"lab": [{"science": 5}, {"science": 10, "metal": 3}, {"science": 15, "food": 15}, None],
 	"house": [{"plank": 10}, {"plank": 15, "metal": 5}, {"plank": 15, "science": 10}, None]
 }
