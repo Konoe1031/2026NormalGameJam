@@ -56,7 +56,7 @@ def enter_real_ending():
 	scene = "ending"
 
 def reached_escape_resources() -> bool:
-	return base.population > 100 and base.metal > 50 and base.plank > 50
+	return base.population > 50 and base.metal > 50 and base.plank > 50
 
 def check_interaction():
 	global player
