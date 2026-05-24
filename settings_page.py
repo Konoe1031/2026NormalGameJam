@@ -68,12 +68,12 @@ class KeyCapture:
 		return event.key
 
 
-PANEL = pygame.Rect(180, 70, 600, 580)
-LABEL_X = 220
-TRACK_X = 470
-TRACK_W = 260
+PANEL = pygame.Rect(150, 60, 660, 600)
+LABEL_X = 190
+TRACK_X = 430
+TRACK_W = 250
 ROW_H = 56
-FIRST_Y = 150
+FIRST_Y = 140
 SLIDER_ORDER = ["sfx", "music", "view", "typing"]
 
 
@@ -89,6 +89,7 @@ class SettingsPage:
 		self.message = ""
 		self._font = _cjk_font(28)
 		self._hint = _cjk_font(20)
+		self._note = _cjk_font(16)
 		self._sliders = {"sfx": self.sfx, "music": self.music, "view": self.view, "typing": self.typing}
 
 	def _row_y(self, index):
@@ -231,8 +232,14 @@ class SettingsPage:
 		sr = self._seed_rect()
 		pygame.draw.rect(screen, (60, 64, 74), sr)
 		pygame.draw.rect(screen, (235, 235, 245) if self.seed.focused else (120, 120, 130), sr, 2)
-		screen.blit(self._hint.render(self.seed.value, True, (245, 245, 245)), (sr.x + 6, sr.y + 6))
-		screen.blit(self._hint.render("(下次開新遊戲生效)", True, (170, 170, 180)), (sr.right + 12, sy))
+		seed_surf = self._hint.render(self.seed.value, True, (245, 245, 245))
+		screen.set_clip(sr.inflate(-6, -4))
+		seed_x = sr.x + 6
+		if seed_surf.get_width() > sr.width - 12:
+			seed_x = sr.right - 6 - seed_surf.get_width()
+		screen.blit(seed_surf, (seed_x, sr.y + 6))
+		screen.set_clip(None)
+		screen.blit(self._note.render("(下次開新遊戲生效)", True, (170, 170, 180)), (sr.x, sr.bottom + 2))
 
 		ky = self._row_y(5)
 		screen.blit(self._font.render("── 鍵盤設定 ──", True, (200, 200, 210)), (LABEL_X, ky))
