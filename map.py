@@ -13,6 +13,45 @@ virus_width = 14
 virus_damage = 5
 virus_flash_until = 0
 virus_flash_duration = 220
+virus_wave_sound_path = "./src/audio/virus_wave.mp3"
+virus_wave_sound: pygame.mixer.Sound | None = None
+blind_mask_path = "./src/img/texture/mask.webp"
+blind_mask: pygame.Surface | None = None
+blind_mask_scaled: pygame.Surface | None = None
+blind_mask_size: Tuple[int, int] | None = None
+
+def __play_virus_wave_sound():
+	global virus_wave_sound
+	if not pygame.mixer.get_init():
+		try:
+			pygame.mixer.init()
+		except pygame.error as e:
+			print(f"virus_wave: mixer init failed: {e}")
+			return
+	if virus_wave_sound == None:
+		try:
+			virus_wave_sound = pygame.mixer.Sound(virus_wave_sound_path)
+			virus_wave_sound.set_volume(0.75)
+		except pygame.error as e:
+			print(f"virus_wave: failed to load {virus_wave_sound_path}: {e}")
+			return
+	virus_wave_sound.play()
+
+def draw_blind_mask(screen: pygame.Surface, player: player_t):
+	global blind_mask, blind_mask_scaled, blind_mask_size
+	if player.state < setting.player_state["blind"]:
+		return
+	if blind_mask == None:
+		try:
+			blind_mask = pygame.image.load(blind_mask_path).convert_alpha()
+		except pygame.error as e:
+			print(f"blind: failed to load {blind_mask_path}: {e}")
+			return
+	screen_size = screen.get_size()
+	if blind_mask_scaled == None or blind_mask_size != screen_size:
+		blind_mask_scaled = pygame.transform.smoothscale(blind_mask, screen_size)
+		blind_mask_size = screen_size
+	screen.blit(blind_mask_scaled, (0, 0))
 
 def __next_virus_time(x: int, y: int, now: int) -> int:
 	rng = random.Random(f"virus_next({int(x)},{int(y)},{now},{setting.seed})")
@@ -163,7 +202,8 @@ def __draw_virus_waves(screen: pygame.Surface, player: player_t):
 			if player.action != "prevent":
 				player.state += virus_damage
 				virus_flash_until = now + virus_flash_duration
-				print(f"infected: state={player.get_state()}")
+				__play_virus_wave_sound()
+				print(f"infected: state={player.state}")
 			wave["hit"] = True
 		active_waves.append(wave)
 	virus_waves[:] = active_waves
