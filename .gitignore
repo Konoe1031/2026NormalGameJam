@@ -9,3 +9,7 @@ __pycache__/
 .vscode/
 .idea/
 **/.DS_Store
+docs/
+tests/
+
+settings.json

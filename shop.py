@@ -104,7 +104,7 @@ def buy(player: player_t, good: str):
 	if good == "distance":
 		player.touch_distance += .5
 	elif good == "speed":
-		player.speed_base += .075
+		player.speed_base *= 1.1025
 	elif good == "restaurant":
 		base.food_decrease_ratio += 5
 	elif good == "house":

@@ -1,11 +1,11 @@
 import json
 import os
 import pygame
+import setting
 
 WIDTH, HEIGHT = 960, 720
 BOX_H = 200
 PAD = 40
-TYPE_SPEED = 15  # 每秒顯示的字數
 TYPING_SOUND = "./src/audio/typing.mp3"
 SOUND_START = 1.0  # 從音檔第幾秒開始播（跳過開頭靜音）
 FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.ttf")
@@ -73,12 +73,13 @@ def _update_typing(text: str) -> None:
 		_last_ms = now
 	dt = now - _last_ms
 	_last_ms = now
-	_typed = min(_typed + dt * TYPE_SPEED / 1000.0, len(text))
+	_typed = min(_typed + dt * setting.typing_speed / 1000.0, len(text))
 
 
 def _start_typing_sound() -> None:
 	global _sound_on
 	if _audio_ok and not _sound_on:
+		pygame.mixer.music.set_volume(setting.music_volume)
 		pygame.mixer.music.play(-1, start=SOUND_START)
 		_sound_on = True
 

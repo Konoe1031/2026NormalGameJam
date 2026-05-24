@@ -1,4 +1,5 @@
 import pygame
+import setting
 
 WIDTH, HEIGHT = 960, 720
 BTN_SCALE = 1.5
@@ -30,9 +31,9 @@ def _ensure_init():
 	_font = pygame.font.SysFont(None, 40)
 
 	right_margin, bottom_margin, gap = 95, 60, 34
-	setting = _place("setting", bottomright=(WIDTH - right_margin, HEIGHT - bottom_margin))
-	start = _place("start", bottomright=(WIDTH - right_margin, setting["rect"].top - gap))
-	_buttons = {"start": start, "settings": setting}
+	setting_btn = _place("setting", bottomright=(WIDTH - right_margin, HEIGHT - bottom_margin))
+	start = _place("start", bottomright=(WIDTH - right_margin, setting_btn["rect"].top - gap))
+	_buttons = {"start": start, "settings": setting_btn}
 	_back_button = _place("back", topleft=(40, 40))
 
 	if not pygame.mixer.get_init():
@@ -43,6 +44,7 @@ def _ensure_init():
 	if pygame.mixer.get_init():
 		try:
 			_click_sound = pygame.mixer.Sound(BUTTON_SOUND)
+			setting.register_sfx(_click_sound)
 		except pygame.error as e:
 			print(f"home: 載入 {BUTTON_SOUND} 失敗，按鈕將無音效：{e}")
 
@@ -74,20 +76,4 @@ def handle_click(pos: tuple[int, int]) -> str | None:
 		if btn["rect"].collidepoint(pos):
 			_play_click()
 			return key
-	return None
-
-
-def draw_settings(screen: pygame.Surface) -> None:
-	_ensure_init()
-	screen.fill((232, 240, 232))
-	title = _font.render("SETTINGS", True, (70, 58, 48))
-	screen.blit(title, title.get_rect(center=(WIDTH // 2, HEIGHT // 2)))
-	_draw_button(screen, _back_button)
-
-
-def handle_settings_click(pos: tuple[int, int]) -> str | None:
-	_ensure_init()
-	if _back_button["rect"].collidepoint(pos):
-		_play_click()
-		return "back"
 	return None

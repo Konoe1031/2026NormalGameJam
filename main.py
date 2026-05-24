@@ -1,15 +1,21 @@
 import pygame, random
-import inventory, map, source, base, home, story, shop, bgm, hud, setting
+import inventory, map, source, base, home, story, shop, bgm, hud
+import setting, settings_page
 from player import player_t
 from hotkey import hotkey_t
 
 pygame.init()
 screen = pygame.display.set_mode((960, 720))
+setting.load()
+source.rescale()
+setting.apply_audio()
 clock = pygame.time.Clock()
 running = True
 scene = "home"
 inventory_open = False
 previous_frame_tick = 0
+settings_ui = settings_page.SettingsPage()
+settings_return_scene = "home"
 pickup_sound = None
 storage_sound = None
 
@@ -45,6 +51,11 @@ def enter_bad_mutation_ending():
 	story.load("bad_mutation")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
+def enter_bad_resistance_ending():
+	global scene
+	story.load("bad_resistance")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
 def enter_real_ending():
 	global scene
 	story.load("real_end")
@@ -56,7 +67,7 @@ def enter_real2_ending():
 	bgm.play(bgm.REAL_END, 0.45)
 	scene = "ending"
 def reached_escape_resources() -> bool:
-	return base.resource["population"] > 50 and base.resource["metal"] > 50 and base.resource["plank"] > 50
+	return base.resource["population"] > 50 and base.resource["metal"] > 30 and base.resource["plank"] > 30
 def bought_all_upgrades_except_resistance() -> bool:
 	for good, prices in setting.good_price.items():
 		if good == "resistance":
@@ -67,8 +78,14 @@ def bought_all_upgrades_except_resistance() -> bool:
 	return True
 def reached_real2_condition() -> bool:
 	return bought_all_upgrades_except_resistance() and \
-		player.upgrade.get("resistance", 0) == 0 and \
+		player.upgrade.get("resistance", 1) <= 1 and \
 		base.resource["population"] >= 120
+def reached_bad_resistance_condition() -> bool:
+	return bought_all_upgrades_except_resistance() and \
+		player.upgrade.get("resistance", 1) > 1 and \
+		base.resource["population"] >= 120
+def maxed_upgrade(good: str) -> bool:
+	return player.upgrade.get(good, 0) >= len(setting.good_price[good]) - 1
 def check_interaction():
 	global player, scene, pickup_sound, storage_sound
 	biome = map.get_biome(player.x, player.y - 1, player)
@@ -111,7 +128,7 @@ hotkeys: dict[str, hotkey_t] = {
 	"move_up": hotkey_t([pygame.K_UP, pygame.K_w]),
 	"move_down": hotkey_t([pygame.K_DOWN, pygame.K_s]),
 	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction),
-	"inventory": hotkey_t([pygame.K_TAB], on_down=open_inventory, on_up=close_inventory),
+	"inventory": hotkey_t([setting.key_inventory], on_down=open_inventory, on_up=close_inventory),
 	"prevent": hotkey_t([pygame.K_LSHIFT, pygame.K_RSHIFT])
 }
 
@@ -124,10 +141,13 @@ while running:
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				action = home.handle_click(event.pos)
 				if action == "start":
+					setting.seed = setting.configured_seed
 					story.load("intro")
 					bgm.play(bgm.CG, 0.45)
 					scene = "story"
 				elif action == "settings":
+					settings_return_scene = "home"
+					settings_ui.enter()
 					scene = "settings"
 		elif scene == "story":
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -146,11 +166,27 @@ while running:
 				bgm.play(bgm.MAIN_PAGE, 0.4)
 				scene = "home"
 		elif scene == "settings":
-			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-				if home.handle_settings_click(event.pos) == "back":
-					scene = "home"
+			result = settings_ui.handle_event(event)
+			if result in ("save", "back"):
+				if result == "save":
+					setting.save()
+				else:
+					settings_ui.revert()
+				hotkeys["inventory"].keys = [setting.key_inventory]
+				scene = settings_return_scene
+				if scene == "home":
 					bgm.play(bgm.MAIN_PAGE, 0.4)
 		elif scene == "game":
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and hud.settings_button_clicked(event.pos):
+				settings_return_scene = "game"
+				settings_ui.enter()
+				scene = "settings"
+				continue
+			if event.type == pygame.KEYDOWN and event.key == setting.key_settings:
+				settings_return_scene = "game"
+				settings_ui.enter()
+				scene = "settings"
+				continue
 			if event.type == pygame.KEYDOWN:
 				for keys in hotkeys.values():
 					keys.check_down(event.key)
@@ -177,11 +213,14 @@ while running:
 		if biome == "heaven":
 			enter_real_ending()
 			continue
+		if reached_bad_resistance_condition():
+			enter_bad_resistance_ending()
+			continue
 		if reached_real2_condition():
 			enter_real2_ending()
 			continue
 		if reached_escape_resources():
-			if base.resource["science"] > 70:
+			if maxed_upgrade("lab"):
 				enter_bad_human_ending()
 			else:
 				enter_bad_science_ending()
@@ -209,6 +248,7 @@ while running:
 			inventory.draw(screen)
 			base.draw_info(screen)
 		map.draw_virus_flash(screen)
+		hud.draw_settings_button(screen)
 	elif scene == "shop":
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
@@ -222,7 +262,7 @@ while running:
 	elif scene == "ending":
 		story.draw(screen)
 	elif scene == "settings":
-		home.draw_settings(screen)
+		settings_ui.draw(screen)
 	# Display
 	pygame.display.flip()
 	clock.tick(60)
