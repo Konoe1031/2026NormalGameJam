@@ -1,5 +1,5 @@
 import pygame
-import source, setting, base
+import source, setting, base, inventory
 from player import player_t
 from home import _click_sound, _play_click, _draw_button, BTN_SCALE, WIDTH, HEIGHT
 from story import _cjk_font
@@ -109,6 +109,8 @@ def buy(player: player_t, good: str):
 		base.food_decrease_ratio += 5
 	elif good == "house":
 		base.population_limit += 30
-	elif good == "lab" and player.upgrade["resistance"] == 0:
-		player.upgrade["resistance"] = 1
+	elif good == "lab":
+		if player.upgrade["resistance"] == 0:
+			player.upgrade["resistance"] = 1
+		else: inventory.maximum_slot += 5
 	return

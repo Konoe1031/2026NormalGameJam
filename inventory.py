@@ -8,6 +8,7 @@ SLOT_SIZE = 48
 SLOT_GAP = 8
 PADDING = 16
 MAX_STACK = 7
+maximum_slot = COLUMNS
 
 slots: list[dict[str, str | int] | None] = [None] * SLOT_COUNT
 
@@ -16,7 +17,9 @@ def add_item(item: str) -> bool:
 		item = "mango"
 	if item in ("elmo", "omuba"):
 		item = "good_meat"
-	for slot in slots:
+	for index, slot in enumerate(slots):
+		if index >= maximum_slot:
+			break
 		if slot != None and slot["item"] == item and slot["count"] < MAX_STACK:
 			slot["count"] += 1
 			return True
