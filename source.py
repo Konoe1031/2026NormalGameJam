@@ -54,6 +54,7 @@ foreground_override: dict[Tuple[int, int], str] = {}
 
 hints: dict[str, pygame.Surface] = {}
 population_icon: pygame.Surface | None = None
+virus_icon: pygame.Surface | None = None
 structures: dict[str, pygame.Surface] = {}
 background: dict[str, list[pygame.Surface]] = {}
 foreground: dict[str, dict[str, pygame.Surface]] = {}
@@ -61,13 +62,14 @@ girl: dict[str, list[pygame.Surface]] = {}
 
 
 def build() -> None:
-	global hints, population_icon, structures, background, foreground, girl
+	global hints, population_icon, virus_icon, structures, background, foreground, girl
 
 	hints = {}
 	for key in ("e",):
 		hints[key] = load_source(f"hint_{key}")
 
 	population_icon = load_source("population")
+	virus_icon = load_source("virus")
 	structures = {
 		"home": load_source("home", 9)
 	}
@@ -89,8 +91,10 @@ def build() -> None:
 	# [facing][animation]
 	girl = {
 		"fallback": [load_source("girl", 2)],
-		"left_prevent": [load_source("girl_left_prevent", 2)],
-		"right_prevent": [load_source("girl_right_prevent", 2)],
+		"left_prevent": [load_source("girl_vomit_1", 2)],
+		"right_prevent": [load_source("girl_vomit_2", 2)],
+		"left_stuck": [load_source("girl_left_prevent", 2)],
+		"right_stuck": [load_source("girl_right_prevent", 2)],
 		"up_walk": [load_source(f"girl_up_walk{i}", 2) for i in (0,1,0,2)],
 		"down_walk": [load_source(f"girl_down_walk{i}", 2) for i in (0,1,0,2)],
 		"left_walk": [load_source(f"girl_left_walk{i}", 2) for i in (0,1,0,2)],

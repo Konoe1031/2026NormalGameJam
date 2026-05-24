@@ -12,6 +12,8 @@ virus_speed = 0.12
 virus_radius_max = 320
 virus_width = 14
 virus_damage = 5
+virus_flash_until = 0
+virus_flash_duration = 220
 
 def __next_virus_time(x: int, y: int, now: int) -> int:
 	rng = random.Random(f"virus_next({int(x)},{int(y)},{now},{setting.seed})")
@@ -125,6 +127,7 @@ def __update_virus_outlet(ix: int, iy: int):
 	virus_next_times[key] = __next_virus_time(ix, iy, now)
 
 def __draw_virus_waves(screen: pygame.Surface, player: player_t):
+	global virus_flash_until
 	now = pygame.time.get_ticks()
 	active_waves = []
 	for wave in virus_waves:
@@ -142,10 +145,21 @@ def __draw_virus_waves(screen: pygame.Surface, player: player_t):
 		if not wave["hit"] and abs(distance - radius) <= virus_width:
 			if player.action != "prevent":
 				player.state += virus_damage
+				virus_flash_until = now + virus_flash_duration
 				print(f"infected: state={player.state}")
 			wave["hit"] = True
 		active_waves.append(wave)
 	virus_waves[:] = active_waves
+
+def draw_virus_flash(screen: pygame.Surface):
+	now = pygame.time.get_ticks()
+	if now >= virus_flash_until:
+		return
+	progress = (virus_flash_until - now) / virus_flash_duration
+	alpha = int(210 * progress)
+	flash = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+	flash.fill((43, 186, 74, alpha))
+	screen.blit(flash, (0, 0))
 
 def __draw_foreground(screen: pygame.Surface, player: player_t, ix: int, iy: int, dx: float, dy: float):
 	item = get_foreground_item(ix, iy, player)
