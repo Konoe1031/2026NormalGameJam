@@ -29,6 +29,8 @@ def add_item(item: str) -> bool:
 			return True
 	for index, slot in enumerate(slots):
 		if slot == None:
+			if index >= maximum_slot:
+				return False
 			slots[index] = {"item": item, "count": 1}
 			return True
 	return False
@@ -52,12 +54,15 @@ def draw(screen: pygame.Surface):
 	screen.blit(panel, (panel_x, panel_y))
 
 	slot_image = pygame.transform.scale(source.background["lake"][1], (SLOT_SIZE, SLOT_SIZE))
+	forbidden = pygame.transform.scale(source.background["clay"][1], (SLOT_SIZE, SLOT_SIZE))
 	for row in range(ROWS):
 		for column in range(COLUMNS):
 			index = row * COLUMNS + column
 			x = panel_x + PADDING + column * (SLOT_SIZE + SLOT_GAP)
 			y = panel_y + PADDING + row * (SLOT_SIZE + SLOT_GAP)
-			screen.blit(slot_image, (x, y))
+			if row * COLUMNS + column >= maximum_slot:
+				screen.blit(forbidden, (x, y))
+			else: screen.blit(slot_image, (x, y))
 			pygame.draw.rect(screen, (230, 240, 255), (x, y, SLOT_SIZE, SLOT_SIZE), 2)
 
 			slot = slots[index]
