@@ -101,6 +101,7 @@ def check_interaction():
 		if storage_sound != None:
 			storage_sound.play()
 		base.store_resource()
+		tutorial.notify("store")
 	if biome == "shop":
 		scene = "shop"
 		tutorial.notify("shop")
