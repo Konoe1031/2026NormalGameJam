@@ -1,5 +1,5 @@
 import pygame, random
-import inventory, map, source, base, home, story, bgm, hud
+import inventory, map, source, base, home, story, shop, bgm, hud
 import setting, settings_page
 from player import player_t
 from hotkey import hotkey_t
@@ -16,6 +16,8 @@ inventory_open = False
 previous_frame_tick = 0
 settings_ui = settings_page.SettingsPage()
 settings_return_scene = "home"
+pickup_sound = None
+storage_sound = None
 
 player = player_t()
 bgm.play(bgm.MAIN_PAGE, 0.4)
@@ -24,59 +26,63 @@ def enter_game():
 	global scene
 	bgm.play(bgm.MAIN_GAME, 0.38)
 	scene = "game"
-
 def enter_bad_virus_ending():
 	global scene
 	story.load("bad_virus")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
-
 def enter_bad_population_ending():
 	global scene
 	story.load("bad_population")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
-
 def enter_bad_science_ending():
 	global scene
 	story.load("bad_science")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
-
 def enter_bad_human_ending():
 	global scene
 	story.load("bad_human")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
-
 def enter_bad_mutation_ending():
 	global scene
 	story.load("bad_mutation")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
-
 def enter_real_ending():
 	global scene
 	story.load("real_end")
 	bgm.play(bgm.REAL_END, 0.45)
 	scene = "ending"
-
 def reached_escape_resources() -> bool:
-	return base.population > 50 and base.metal > 50 and base.plank > 50
-
+	return base.resource["population"] > 50 and base.resource["metal"] > 50 and base.resource["plank"] > 50
 def check_interaction():
-	global player
-	if map.get_biome(player.x, player.y - 1, player) == "home":
-
-		if player.state > 80 and random.uniform(0, 100) < 20:
+	global player, scene, pickup_sound, storage_sound
+	biome = map.get_biome(player.x, player.y - 1, player)
+	if biome == "home":
+		if player.get_state() > 80 and random.uniform(0, 100) < 20:
 			enter_bad_mutation_ending()
 			return
+		if storage_sound == None:
+			if pygame.mixer.get_init():
+				storage_sound = pygame.mixer.Sound("./src/audio/put_item.mp3")
+		if storage_sound != None:
+			storage_sound.play()
 		base.store_resource()
+	if biome == "shop":
+		scene = "shop"
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
 		if not inventory.add_item(item):
 			print("inventory is full")
 			continue
+		if pickup_sound == None:
+			if pygame.mixer.get_init():
+				pickup_sound = pygame.mixer.Sound("./src/audio/pickup.mp3")
+		if pickup_sound != None:
+			pickup_sound.play()
 		source.foreground_override[x, y] = f"empty_{item}"
 	return
 def open_inventory():
@@ -159,11 +165,20 @@ while running:
 			if event.type == pygame.KEYUP:
 				for keys in hotkeys.values():
 					keys.check_up(event.key)
+		elif scene == "shop":
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+				action = shop.handle_click(event.pos)
+				if action == "back":
+					scene = "game"
+					for hotkey in hotkeys.values():
+						hotkey.press = False
+				else:
+					shop.buy(player, action)
 	if scene == "game":
-		if player.state > 100:
+		if player.get_state() > 100:
 			enter_bad_virus_ending()
 			continue
-		if base.population <= 0:
+		if base.resource["population"] < 2:
 			enter_bad_population_ending()
 			continue
 		if reached_escape_resources():
@@ -189,12 +204,17 @@ while running:
 			player.move(0, player.speed())
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
+		map.draw_blind_mask(screen, player)
 		hud.draw_player_state(screen, player)
 		if inventory_open:
 			inventory.draw(screen)
 			base.draw_info(screen)
 		map.draw_virus_flash(screen)
 		hud.draw_settings_button(screen)
+	elif scene == "shop":
+		map.draw_background(screen, player)
+		map.draw_foreground(screen, player)
+		shop.draw(screen, player)
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":

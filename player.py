@@ -13,6 +13,11 @@ class player_t:
 		self.cooldown = 0
 		self.speed_base = .125
 		self.action = None
+		self.upgrade = {}
+	def get_state(self):
+		if self.upgrade.get("resistance") != None:
+			return max(self.state / 2, self.state - 30)
+		return self.state
 	def move(self, x: float, y: float):
 		if y > 0: self.facing = "down"
 		if y < 0: self.facing = "up"
@@ -24,7 +29,7 @@ class player_t:
 			self.action = "stuck"
 			return self
 		if pygame.time.get_ticks() - self.cooldown > 5000: # 5 sec
-			movability = self.state - setting.player_state["movability"]
+			movability = self.get_state() - setting.player_state["movability"]
 			if movability > 0 and random.uniform(0, 100) < movability:
 				self.cooldown = pygame.time.get_ticks() + 500
 				self.action = "stuck"
@@ -36,16 +41,16 @@ class player_t:
 		if item != None:
 			return self
 		biome = map.get_biome(tx // 1, ty // 1, self)
-		if biome in ("ocean", "home", "void"):
+		if biome in ("ocean", "home", "shop", "void"):
 			return self
 		self.action = "walk"
 		self.x, self.y = tx, ty
 		return self
 	def speed(self):
 		base = self.speed_base
-		if self.state >= setting.player_state["upsidedown"]:
+		if self.get_state() >= setting.player_state["upsidedown"]:
 			base = -base
-		if self.state >= setting.player_state["unstable"]:
+		if self.get_state() >= setting.player_state["unstable"]:
 			random.seed(f"unstable({pygame.time.get_ticks() // 100})")
 			return random.uniform(.25, 1) * base
 		return base
