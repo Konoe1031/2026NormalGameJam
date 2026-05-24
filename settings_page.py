@@ -102,6 +102,7 @@ class SettingsPage:
 		self.seed = TextInput(setting.configured_seed, max_len=24)
 		self.key_inv = KeyCapture()
 		self.key_set = KeyCapture()
+		self.key_prevent = KeyCapture()
 		self.message = ""
 		self._font = _cjk_font(28)
 		self._hint = _cjk_font(20)
@@ -197,8 +198,12 @@ class SettingsPage:
 			source.rescale()
 
 	def _conflict(self, key, which):
-		other = setting.key_settings if which == "inv" else setting.key_inventory
-		return key == other
+		keys = {
+			"inv": setting.key_inventory,
+			"set": setting.key_settings,
+			"prevent": setting.key_prevent,
+		}
+		return any(name != which and key == value for name, value in keys.items())
 
 	def handle_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -214,7 +219,7 @@ class SettingsPage:
 					self._apply()
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_ESCAPE and not self.key_inv.capturing \
-				and not self.key_set.capturing and not self.seed.focused:
+				and not self.key_set.capturing and not self.key_prevent.capturing and not self.seed.focused:
 				return "back"
 			self._on_key_down(event)
 		return None
@@ -223,6 +228,7 @@ class SettingsPage:
 		self.seed.focused = False
 		self.key_inv.capturing = False
 		self.key_set.capturing = False
+		self.key_prevent.capturing = False
 
 	def _on_mouse_down(self, pos):
 		for action in ("save", "back"):
@@ -250,6 +256,10 @@ class SettingsPage:
 			self._defocus()
 			self.key_set.start()
 			return None
+		if self._key_rect(2).collidepoint(pos):
+			self._defocus()
+			self.key_prevent.start()
+			return None
 		self._defocus()
 		return None
 
@@ -270,6 +280,15 @@ class SettingsPage:
 					self.message = "此鍵已被使用"
 				else:
 					setting.key_settings = key
+					self.message = ""
+			return
+		if self.key_prevent.capturing:
+			key = self.key_prevent.take(event)
+			if key is not None:
+				if self._conflict(key, "prevent"):
+					self.message = "此鍵已被使用"
+				else:
+					setting.key_prevent = key
 					self.message = ""
 			return
 		if self.seed.focused and self.seed.handle_key(event):
@@ -322,6 +341,7 @@ class SettingsPage:
 		for index, (label, key, cap) in enumerate([
 			("開啟背包", setting.key_inventory, self.key_inv),
 			("開設定頁", setting.key_settings, self.key_set),
+			("蹲下", setting.key_prevent, self.key_prevent),
 		]):
 			y = self._row_y(6 + index)
 			screen.blit(self._font.render(label, True, TEXT_MAIN), (LABEL_X, y))
@@ -332,7 +352,7 @@ class SettingsPage:
 			screen.blit(self._hint.render(text, True, TEXT_MAIN), (kr.x + 6, kr.y + 6))
 
 		if self.message:
-			screen.blit(self._hint.render(self.message, True, MESSAGE_COLOR), (LABEL_X, self._row_y(8)))
+			screen.blit(self._hint.render(self.message, True, MESSAGE_COLOR), (LABEL_X, self._row_y(9)))
 		for action in ("save", "back"):
 			self._draw_button(screen, self._buttons[action])
 

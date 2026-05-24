@@ -30,6 +30,7 @@ DEFAULTS = {
 	"key_inventory": pygame.K_TAB,
 	"key_settings": pygame.K_ESCAPE,
 	"tutorial_done": False,
+	"key_prevent": pygame.K_LSHIFT,
 }
 
 _PERSIST_KEYS = list(DEFAULTS.keys())
@@ -42,6 +43,7 @@ typing_speed = DEFAULTS["typing_speed"]
 key_inventory = DEFAULTS["key_inventory"]
 key_settings = DEFAULTS["key_settings"]
 tutorial_done = DEFAULTS["tutorial_done"]
+key_prevent = DEFAULTS["key_prevent"]
 
 seed = configured_seed
 

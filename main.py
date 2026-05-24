@@ -22,6 +22,20 @@ storage_sound = None
 player = player_t()
 bgm.play(bgm.MAIN_PAGE, 0.4)
 
+def start_new_game():
+	global player, inventory_open, previous_frame_tick
+	player = player_t()
+	inventory_open = False
+	previous_frame_tick = pygame.time.get_ticks() // 3000
+	base.reset()
+	inventory.reset()
+	map.reset()
+	source.reset_runtime_state()
+	setting.seed = setting.configured_seed
+	inventory.maximum_slot = 5
+	for hotkey in hotkeys.values():
+		hotkey.press = False
+
 def enter_game():
 	global scene
 	bgm.play(bgm.MAIN_GAME, 0.38)
@@ -135,7 +149,7 @@ hotkeys: dict[str, hotkey_t] = {
 	"move_down": hotkey_t([pygame.K_DOWN, pygame.K_s]),
 	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction),
 	"inventory": hotkey_t([setting.key_inventory], on_down=open_inventory, on_up=close_inventory),
-	"prevent": hotkey_t([pygame.K_LSHIFT, pygame.K_RSHIFT])
+	"prevent": hotkey_t([setting.key_prevent])
 }
 
 while running:
@@ -147,7 +161,7 @@ while running:
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				action = home.handle_click(event.pos)
 				if action == "start":
-					setting.seed = setting.configured_seed
+					start_new_game()
 					story.load("intro")
 					bgm.play(bgm.CG, 0.45)
 					scene = "story"
@@ -179,6 +193,7 @@ while running:
 				else:
 					settings_ui.revert()
 				hotkeys["inventory"].keys = [setting.key_inventory]
+				hotkeys["prevent"].keys = [setting.key_prevent]
 				scene = settings_return_scene
 				if scene == "home":
 					bgm.play(bgm.MAIN_PAGE, 0.4)
@@ -255,6 +270,7 @@ while running:
 		map.draw_background(screen, player)
 		map.draw_foreground(screen, player)
 		map.draw_blind_mask(screen, player)
+		map.draw_base_arrow(screen, player)
 		hud.draw_player_state(screen, player)
 		if inventory_open:
 			inventory.draw(screen)

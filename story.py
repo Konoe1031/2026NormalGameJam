@@ -19,6 +19,8 @@ _typed = 0.0
 _last_ms: int | None = None
 _audio_ok = False
 _sound_on = False
+_typing_sound: pygame.mixer.Sound | None = None
+_typing_channel: pygame.mixer.Channel | None = None
 
 
 def _cjk_font(size: int) -> pygame.font.Font:
@@ -33,7 +35,7 @@ def _cjk_font(size: int) -> pygame.font.Font:
 
 
 def _ensure_init() -> None:
-	global _font, _hint_font, _audio_ok
+	global _font, _hint_font, _audio_ok, _typing_sound, _typing_channel
 	if _font is not None:
 		return
 	_font = _cjk_font(32)
@@ -46,7 +48,9 @@ def _ensure_init() -> None:
 	_audio_ok = pygame.mixer.get_init() is not None
 	if _audio_ok:
 		try:
-			pygame.mixer.music.load(TYPING_SOUND)
+			_typing_sound = pygame.mixer.Sound(TYPING_SOUND)
+			setting.register_sfx(_typing_sound)
+			_typing_channel = pygame.mixer.Channel(2)
 		except pygame.error as e:
 			print(f"story: 載入 {TYPING_SOUND} 失敗，劇情將無音效：{e}")
 			_audio_ok = False
@@ -78,16 +82,15 @@ def _update_typing(text: str) -> None:
 
 def _start_typing_sound() -> None:
 	global _sound_on
-	if _audio_ok and not _sound_on:
-		pygame.mixer.music.set_volume(setting.music_volume)
-		pygame.mixer.music.play(-1, start=SOUND_START)
+	if _audio_ok and not _sound_on and _typing_channel is not None and _typing_sound is not None:
+		_typing_channel.play(_typing_sound, loops=-1)
 		_sound_on = True
 
 
 def _stop_typing_sound() -> None:
 	global _sound_on
-	if _audio_ok and _sound_on:
-		pygame.mixer.music.stop()
+	if _audio_ok and _sound_on and _typing_channel is not None:
+		_typing_channel.stop()
 		_sound_on = False
 
 
