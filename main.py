@@ -51,6 +51,11 @@ def enter_bad_mutation_ending():
 	story.load("bad_mutation")
 	bgm.play(bgm.BAD_END, 0.45)
 	scene = "bad_ending"
+def enter_bad_resistance_ending():
+	global scene
+	story.load("bad_resistance")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
 def enter_real_ending():
 	global scene
 	story.load("real_end")
@@ -73,7 +78,11 @@ def bought_all_upgrades_except_resistance() -> bool:
 	return True
 def reached_real2_condition() -> bool:
 	return bought_all_upgrades_except_resistance() and \
-		player.upgrade.get("resistance", 0) == 1 and \
+		player.upgrade.get("resistance", 1) <= 1 and \
+		base.resource["population"] >= 120
+def reached_bad_resistance_condition() -> bool:
+	return bought_all_upgrades_except_resistance() and \
+		player.upgrade.get("resistance", 1) > 1 and \
 		base.resource["population"] >= 120
 def maxed_upgrade(good: str) -> bool:
 	return player.upgrade.get(good, 0) >= len(setting.good_price[good]) - 1
@@ -203,6 +212,9 @@ while running:
 			continue
 		if biome == "heaven":
 			enter_real_ending()
+			continue
+		if reached_bad_resistance_condition():
+			enter_bad_resistance_ending()
 			continue
 		if reached_real2_condition():
 			enter_real2_ending()
