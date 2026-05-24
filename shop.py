@@ -1,7 +1,9 @@
 import pygame
 import source, setting, base
 from player import player_t
-from home import _font, _click_sound, _play_click, _draw_button, BTN_SCALE, WIDTH, HEIGHT
+from home import _click_sound, _play_click, _draw_button, BTN_SCALE, WIDTH, HEIGHT
+from story import _cjk_font
+_font: pygame.font.Font = None
 back_btn: dict = None
 goods: dict[str, dict] = {}
 
@@ -61,7 +63,16 @@ def handle_click(pos: tuple[int, int]) -> str | None:
 			_play_click()
 			return key
 	return None
+BTN_HINT = {
+	"restaurant": "糧食效率",
+	"lab": "科技研究",
+	"house": "人口乘載",
+	"distance": "拾取距離",
+	"speed": "移動速度",
+	"resistance": "人體實驗"
+}
 def draw(screen: pygame.Surface, player: player_t):
+	global _font
 	_ensure_init()
 	_rect = ((WIDTH / 8, HEIGHT / 8), (WIDTH * 6 / 8, HEIGHT * 6 / 8))
 	pygame.draw.rect(screen, (100, 100, 100), _rect)
@@ -72,9 +83,12 @@ def draw(screen: pygame.Surface, player: player_t):
 		if price == None: continue
 		_draw_button(screen, btn)
 		dx, dy = btn["rect"][0] - WIDTH / 32, btn["rect"][1]
-		for key, cost in price.items():
-			base.__draw_info(screen, source.resource[key], f"{cost}", dx, dy)
-			dy += source.resource[key].get_height()
+		tx, ty = btn["rect"][0], btn["rect"][1] + WIDTH / 8
+		if _font == None: _font = _cjk_font(24)
+		screen.blit(_font.render(BTN_HINT[key], True, 0), (tx, ty))
+		for resource, cost in price.items():
+			base.__draw_info(screen, source.resource[resource], f"{cost}", dx, dy)
+			dy += source.resource[resource].get_height()
 
 
 def buy(player: player_t, good: str):
@@ -95,4 +109,6 @@ def buy(player: player_t, good: str):
 		base.food_decrease_ratio += 5
 	elif good == "house":
 		base.population_limit += 30
+	elif good == "lab" and player.upgrade["resistance"] == 0:
+		player.upgrade["resistance"] = 1
 	return

@@ -15,7 +15,7 @@ class player_t:
 		self.action = None
 		self.upgrade = {}
 	def get_state(self):
-		if self.upgrade.get("resistance", 0) > 0:
+		if self.upgrade.get("resistance", 0) > 1:
 			return max(self.state / 2, self.state - 30)
 		return self.state
 	def move(self, x: float, y: float):

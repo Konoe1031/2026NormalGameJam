@@ -17,5 +17,5 @@ good_price = {
 	"restaurant": [{"plank": 5, "food": 5}, {"metal": 5, "food": 10}, {"science": 5, "food": 20}, {"science": 10, "food": 40}, None],
 	"lab": [{"science": 5}, {"science": 10, "metal": 3}, {"science": 15, "food": 15}, None],
 	"house": [{"plank": 10}, {"plank": 15, "metal": 5}, {"plank": 15, "science": 10}, None],
-	"resistance": [{"population": 30}, None]
+	"resistance": [None, {"population": 30}, None]
 }

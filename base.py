@@ -47,12 +47,14 @@ def tick():
 			resource["population"] = population_limit
 	return
 
-def __draw_info(screen: pygame.Surface, icon: pygame.Surface, text: str, x: float, y: float):
+def __render_text(text: str):
 	global _font
 	if _font == None:
 		_font = pygame.font.SysFont(None, 48)
+	return _font.render(text, True, 0)
+def __draw_info(screen: pygame.Surface, icon: pygame.Surface, text: str, x: float, y: float):
 	screen.blit(icon, (x - setting.tile_size, y - setting.tile_size / 4))
-	screen.blit(_font.render(text, True, 0), (x, y))
+	screen.blit(__render_text(text), (x, y))
 	return
 def draw_info(screen: pygame.Surface):
 	x = screen.get_width() - 2 * setting.tile_size
