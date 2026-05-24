@@ -56,8 +56,25 @@ def enter_real_ending():
 	story.load("real_end")
 	bgm.play(bgm.REAL_END, 0.45)
 	scene = "ending"
+def enter_real2_ending():
+	global scene
+	story.load("real_end2")
+	bgm.play(bgm.REAL_END, 0.45)
+	scene = "ending"
 def reached_escape_resources() -> bool:
 	return base.resource["population"] > 50 and base.resource["metal"] > 50 and base.resource["plank"] > 50
+def bought_all_upgrades_except_resistance() -> bool:
+	for good, prices in setting.good_price.items():
+		if good == "resistance":
+			continue
+		max_level = len(prices) - 1
+		if player.upgrade.get(good, 0) < max_level:
+			return False
+	return True
+def reached_real2_condition() -> bool:
+	return bought_all_upgrades_except_resistance() and \
+		player.upgrade.get("resistance", 0) == 0 and \
+		base.resource["population"] >= 120
 def check_interaction():
 	global player, scene, pickup_sound, storage_sound
 	biome = map.get_biome(player.x, player.y - 1, player)
@@ -178,11 +195,18 @@ while running:
 		if player.get_state() > 100:
 			enter_bad_virus_ending()
 			continue
-		if base.resource["population"] < 2:
+		biome = map.get_biome(player.x, player.y, player)
+		if base.resource["population"] < 2 and biome not in ("road", "badland", "heaven"):
 			enter_bad_population_ending()
 			continue
+		if biome == "heaven":
+			enter_real_ending()
+			continue
+		if reached_real2_condition():
+			enter_real2_ending()
+			continue
 		if reached_escape_resources():
-			if base.science > 70:
+			if base.resource["science"] > 70:
 				enter_bad_human_ending()
 			else:
 				enter_bad_science_ending()
