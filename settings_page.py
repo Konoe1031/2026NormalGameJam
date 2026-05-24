@@ -6,7 +6,19 @@ import source
 WIDTH, HEIGHT = 960, 720
 FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.ttf")
 BUTTON_DIR = os.path.join(os.path.dirname(__file__), "src", "img", "button")
+CG_DIR = os.path.join(os.path.dirname(__file__), "src", "img", "cg")
 BTN_SCALE = 0.62
+
+PANEL_FILL = (250, 250, 246, 168)
+TEXT_MAIN = (34, 38, 44)
+TEXT_SUB = (70, 76, 84)
+TEXT_NOTE = (96, 102, 110)
+TRACK_COLOR = (120, 126, 132)
+HANDLE_COLOR = (44, 50, 60)
+FIELD_FILL = (255, 255, 255)
+FIELD_BORDER = (130, 136, 144)
+FIELD_BORDER_ACTIVE = (52, 108, 170)
+MESSAGE_COLOR = (185, 45, 45)
 
 
 def _cjk_font(size: int) -> pygame.font.Font:
@@ -93,6 +105,8 @@ class SettingsPage:
 		self._hint = _cjk_font(20)
 		self._note = _cjk_font(16)
 		self._sliders = {"sfx": self.sfx, "music": self.music, "view": self.view, "typing": self.typing}
+		self._bg = pygame.transform.smoothscale(
+			pygame.image.load(os.path.join(CG_DIR, "back.png")).convert(), (WIDTH, HEIGHT))
 		back = self._place_button("back", bottomright=(PANEL.right - 28, PANEL.bottom - 14))
 		save = self._place_button("save", bottomright=(back["rect"].left - 22, PANEL.bottom - 14))
 		self._buttons = {"save": save, "back": back}
@@ -234,11 +248,12 @@ class SettingsPage:
 			self._apply()
 
 	def draw(self, screen):
+		screen.blit(self._bg, (0, 0))
 		panel = pygame.Surface((PANEL.width, PANEL.height), pygame.SRCALPHA)
-		panel.fill((20, 24, 32, 200))
+		pygame.draw.rect(panel, PANEL_FILL, panel.get_rect(), border_radius=18)
 		screen.blit(panel, PANEL.topleft)
 
-		title = self._font.render("SETTINGS", True, (245, 245, 245))
+		title = self._font.render("SETTINGS", True, TEXT_MAIN)
 		screen.blit(title, title.get_rect(midtop=(PANEL.centerx, PANEL.top + 16)))
 
 		labels = {"sfx": "音效大小", "music": "音樂大小", "view": "視野", "typing": "打字機速度"}
@@ -252,44 +267,44 @@ class SettingsPage:
 			index = SLIDER_ORDER.index(name)
 			y = self._row_y(index)
 			s = self._sliders[name]
-			screen.blit(self._font.render(labels[name], True, (230, 230, 230)), (LABEL_X, y))
+			screen.blit(self._font.render(labels[name], True, TEXT_MAIN), (LABEL_X, y))
 			tx, cy, tw = self.slider_track(name)
-			pygame.draw.line(screen, (120, 120, 130), (tx, cy), (tx + tw, cy), 4)
+			pygame.draw.line(screen, TRACK_COLOR, (tx, cy), (tx + tw, cy), 4)
 			frac = (s.value - s.vmin) / (s.vmax - s.vmin) if s.vmax != s.vmin else 0
 			hx = int(tx + frac * tw)
-			pygame.draw.circle(screen, (235, 235, 245), (hx, cy), 8)
-			screen.blit(self._hint.render(fmt[name](s.value), True, (210, 210, 210)), (tx + tw + 16, y))
+			pygame.draw.circle(screen, HANDLE_COLOR, (hx, cy), 8)
+			screen.blit(self._hint.render(fmt[name](s.value), True, TEXT_SUB), (tx + tw + 16, y))
 
 		sy = self._row_y(4)
-		screen.blit(self._font.render("種子碼", True, (230, 230, 230)), (LABEL_X, sy))
+		screen.blit(self._font.render("種子碼", True, TEXT_MAIN), (LABEL_X, sy))
 		sr = self._seed_rect()
-		pygame.draw.rect(screen, (60, 64, 74), sr)
-		pygame.draw.rect(screen, (235, 235, 245) if self.seed.focused else (120, 120, 130), sr, 2)
-		seed_surf = self._hint.render(self.seed.value, True, (245, 245, 245))
+		pygame.draw.rect(screen, FIELD_FILL, sr)
+		pygame.draw.rect(screen, FIELD_BORDER_ACTIVE if self.seed.focused else FIELD_BORDER, sr, 2)
+		seed_surf = self._hint.render(self.seed.value, True, TEXT_MAIN)
 		screen.set_clip(sr.inflate(-6, -4))
 		seed_x = sr.x + 6
 		if seed_surf.get_width() > sr.width - 12:
 			seed_x = sr.right - 6 - seed_surf.get_width()
 		screen.blit(seed_surf, (seed_x, sr.y + 6))
 		screen.set_clip(None)
-		screen.blit(self._note.render("(下次開新遊戲生效)", True, (170, 170, 180)), (sr.x, sr.bottom + 2))
+		screen.blit(self._note.render("(下次開新遊戲生效)", True, TEXT_NOTE), (sr.x, sr.bottom + 2))
 
 		ky = self._row_y(5)
-		screen.blit(self._font.render("── 鍵盤設定 ──", True, (200, 200, 210)), (LABEL_X, ky))
+		screen.blit(self._font.render("── 鍵盤設定 ──", True, TEXT_SUB), (LABEL_X, ky))
 		for index, (label, key, cap) in enumerate([
 			("開啟背包", setting.key_inventory, self.key_inv),
 			("開設定頁", setting.key_settings, self.key_set),
 		]):
 			y = self._row_y(6 + index)
-			screen.blit(self._font.render(label, True, (230, 230, 230)), (LABEL_X, y))
+			screen.blit(self._font.render(label, True, TEXT_MAIN), (LABEL_X, y))
 			kr = self._key_rect(index)
-			pygame.draw.rect(screen, (60, 64, 74), kr)
-			pygame.draw.rect(screen, (235, 235, 245) if cap.capturing else (120, 120, 130), kr, 2)
+			pygame.draw.rect(screen, FIELD_FILL, kr)
+			pygame.draw.rect(screen, FIELD_BORDER_ACTIVE if cap.capturing else FIELD_BORDER, kr, 2)
 			text = "請按鍵…" if cap.capturing else pygame.key.name(key)
-			screen.blit(self._hint.render(text, True, (245, 245, 245)), (kr.x + 6, kr.y + 6))
+			screen.blit(self._hint.render(text, True, TEXT_MAIN), (kr.x + 6, kr.y + 6))
 
 		if self.message:
-			screen.blit(self._hint.render(self.message, True, (255, 180, 180)), (LABEL_X, self._row_y(8)))
+			screen.blit(self._hint.render(self.message, True, MESSAGE_COLOR), (LABEL_X, self._row_y(8)))
 		for action in ("save", "back"):
 			self._draw_button(screen, self._buttons[action])
 
