@@ -10,7 +10,7 @@ resource = {
 	"metal": 0,
 	"plank": 0,
 	"science": 0
-}
+	}
 resource_value = {
 	"metal": {"metal": 1},
 	"plank": {"plank": 1},
