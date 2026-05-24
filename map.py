@@ -88,6 +88,11 @@ def get_biome(x: int, y: int, player: player_t) -> str:
 		return "clay"
 	if distance < 200:
 		return "lake"
+	tunnel = abs(x + y)
+	if x > 0 and y < 0:
+		if distance > 300: return "heaven"
+		if tunnel < 2: return "road"
+		if tunnel < 3: return "badland"
 	return "ocean"
 def get_background_tile(x: int, y: int, player: player_t) -> pygame.Surface:
 	biome = get_biome(x, y, player)

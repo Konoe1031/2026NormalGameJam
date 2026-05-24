@@ -153,8 +153,11 @@ while running:
 		if player.get_state() > 100:
 			enter_bad_virus_ending()
 			continue
-		if base.resource["population"] < 2:
+		biome = map.get_biome(player.x, player.y, player)
+		if base.resource["population"] < 2 and biome not in ("road", "badland", "heaven"):
 			enter_bad_population_ending()
+			continue
+		if biome == "heaven":
 			continue
 		if reached_escape_resources():
 			if base.science > 70:

@@ -28,7 +28,10 @@ background_dict = {
 	"clay": 3,
 	"lake": 3,
 	"ocean": 1,
-	"void": 1
+	"void": 1,
+	"road": 1,
+	"badland": 1,
+	"heaven": 1
 }
 # [type of land][number of variant]
 background: dict[str, list[pygame.Surface]] = {}
@@ -63,6 +66,9 @@ foreground_dict = {
 		"outlet": {"chance": 1, "source": False},
 		"elmo": {"chance": 2, "source": True},
 		"good_meat": {"chance": 0, "source": True}
+	},
+	"badland": {
+		"outlet": {"chance": 100, "source": False}
 	}
 }
 # [type of land][type of item][chance %]
