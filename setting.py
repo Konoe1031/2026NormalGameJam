@@ -6,6 +6,7 @@ shop_position = (4, 3)
 player_state = {
 	"unstable": 20,
 	"movability": 30,
+	"elmo": 65,
 	"void": 40,
 	"upsidedown": 75
 }

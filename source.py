@@ -59,7 +59,9 @@ foreground_dict = {
 		"cake": {"chance": .5, "source": True},
 		"drug": {"chance": .5, "source": True},
 		"plank": {"chance": .5, "source": True},
-		"outlet": {"chance": 1, "source": False}
+		"outlet": {"chance": 1, "source": False},
+		"elmo": {"chance": 2, "source": True},
+		"good_meat": {"chance": 0, "source": True}
 	}
 }
 # [type of land][type of item][chance %]

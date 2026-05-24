@@ -19,6 +19,7 @@ resource_value = {
 	"mango": {"food": 5},
 	"can": {"food": 8},
 	"meat": {"food": 15},
+	"good_meat": {"food": 1, "science": .5},
 	"cake": {"food": 3, "population": 1}
 }
 

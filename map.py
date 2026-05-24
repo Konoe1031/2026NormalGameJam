@@ -72,6 +72,8 @@ def get_foreground_item_name(x: int, y: int, player: player_t) -> Tuple[str, str
 		if requirement <= 0:
 			continue
 		if random.uniform(0, full) < requirement:
+			if item in ("elmo", "omuba") and player.get_state() < setting.player_state["elmo"]:
+				return biome, None
 			if source.foreground_dict[biome][item]["source"]:
 				source.foreground_override[x, y] = item
 			return biome, item
