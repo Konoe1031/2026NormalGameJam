@@ -140,7 +140,7 @@ hotkeys: dict[str, hotkey_t] = {
 	"move_down": hotkey_t([pygame.K_DOWN, pygame.K_s]),
 	"interaction": hotkey_t([pygame.K_e], on_down=check_interaction),
 	"inventory": hotkey_t([setting.key_inventory], on_down=open_inventory, on_up=close_inventory),
-	"prevent": hotkey_t([pygame.K_LSHIFT, pygame.K_RSHIFT])
+	"prevent": hotkey_t([setting.key_prevent])
 }
 
 while running:
@@ -184,6 +184,7 @@ while running:
 				else:
 					settings_ui.revert()
 				hotkeys["inventory"].keys = [setting.key_inventory]
+				hotkeys["prevent"].keys = [setting.key_prevent]
 				scene = settings_return_scene
 				if scene == "home":
 					bgm.play(bgm.MAIN_PAGE, 0.4)
