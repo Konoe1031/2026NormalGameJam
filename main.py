@@ -1,5 +1,5 @@
 import pygame, random
-import inventory, map, source, base, home, story, bgm, hud
+import inventory, map, source, base, home, story, shop, bgm, hud
 from player import player_t
 from hotkey import hotkey_t
 
@@ -59,13 +59,15 @@ def reached_escape_resources() -> bool:
 	return base.population > 50 and base.metal > 50 and base.plank > 50
 
 def check_interaction():
-	global player
-	if map.get_biome(player.x, player.y - 1, player) == "home":
-
+	global player, scene
+	biome =map.get_biome(player.x, player.y - 1, player)
+	if biome == "home":
 		if player.state > 80 and random.uniform(0, 100) < 20:
 			enter_bad_mutation_ending()
 			return
 		base.store_resource()
+	if biome == "shop":
+		scene = "shop"
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
 		if not inventory.add_item(item):
@@ -134,6 +136,15 @@ while running:
 			if event.type == pygame.KEYUP:
 				for keys in hotkeys.values():
 					keys.check_up(event.key)
+		elif scene == "shop":
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+				action = shop.handle_click(event.pos)
+				if action == "back":
+					scene = "game"
+					for hotkey in hotkeys.values():
+						hotkey.press = False
+				else:
+					shop.buy(player, action)
 	if scene == "game":
 		if player.state > 100:
 			enter_bad_virus_ending()
@@ -169,6 +180,10 @@ while running:
 			inventory.draw(screen)
 			base.draw_info(screen)
 		map.draw_virus_flash(screen)
+	elif scene == "shop":
+		map.draw_background(screen, player)
+		map.draw_foreground(screen, player)
+		shop.draw(screen, player)
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":
