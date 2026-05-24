@@ -41,7 +41,7 @@ def notify(event: str):
 
 def _finish():
 	global _started
-	_started = False
+	#_started = False
 	setting.tutorial_done = True
 	setting.save()
 
