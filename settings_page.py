@@ -1,5 +1,6 @@
 import os
 import pygame
+import bgm
 import setting
 import source
 
@@ -7,6 +8,7 @@ WIDTH, HEIGHT = 960, 720
 FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.ttf")
 BUTTON_DIR = os.path.join(os.path.dirname(__file__), "src", "img", "button")
 CG_DIR = os.path.join(os.path.dirname(__file__), "src", "img", "cg")
+CLICK_SOUND = os.path.join(os.path.dirname(__file__), "src", "audio", "button.mp3")
 BTN_SCALE = 0.62
 
 PANEL_FILL = (250, 250, 246, 168)
@@ -111,6 +113,29 @@ class SettingsPage:
 		save = self._place_button("save", bottomright=(back["rect"].left - 22, PANEL.bottom - 14))
 		self._buttons = {"save": save, "back": back}
 		self._snapshot = setting.to_dict()
+		self._click_sound = None
+		self._click_loaded = False
+
+	def _ensure_click(self):
+		if self._click_loaded:
+			return
+		self._click_loaded = True
+		if not pygame.mixer.get_init():
+			try:
+				pygame.mixer.init()
+			except pygame.error as e:
+				print(f"settings_page: 音訊初始化失敗：{e}")
+				return
+		try:
+			self._click_sound = pygame.mixer.Sound(CLICK_SOUND)
+			setting.register_sfx(self._click_sound)
+		except pygame.error as e:
+			print(f"settings_page: 載入 {CLICK_SOUND} 失敗：{e}")
+
+	def _play_click(self):
+		self._ensure_click()
+		if self._click_sound is not None:
+			self._click_sound.play()
 
 	def _place_button(self, name, **anchor):
 		img = pygame.image.load(os.path.join(BUTTON_DIR, f"{name}.png")).convert_alpha()
@@ -136,6 +161,7 @@ class SettingsPage:
 
 	def revert(self):
 		setting.restore(self._snapshot)
+		bgm.apply_volume()
 		source.rescale()
 		self._sync_from_setting()
 
@@ -164,6 +190,7 @@ class SettingsPage:
 		setting.typing_speed = int(self.typing.value)
 		setting.configured_seed = self.seed.value
 		setting.apply_audio()
+		bgm.apply_volume()
 		new_tile = int(self.view.value)
 		if new_tile != setting.tile_size:
 			setting.tile_size = new_tile
@@ -200,6 +227,7 @@ class SettingsPage:
 	def _on_mouse_down(self, pos):
 		for action in ("save", "back"):
 			if self._buttons[action]["rect"].collidepoint(pos):
+				self._play_click()
 				return action
 		for name, s in self._sliders.items():
 			tx, cy, tw = self.slider_track(name)
