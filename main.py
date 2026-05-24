@@ -113,6 +113,7 @@ while running:
 					scene = "story"
 				elif action == "settings":
 					settings_return_scene = "home"
+					settings_ui.enter()
 					scene = "settings"
 		elif scene == "story":
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -131,8 +132,12 @@ while running:
 				bgm.play(bgm.MAIN_PAGE, 0.4)
 				scene = "home"
 		elif scene == "settings":
-			if settings_ui.handle_event(event) == "back":
-				setting.save()
+			result = settings_ui.handle_event(event)
+			if result in ("save", "back"):
+				if result == "save":
+					setting.save()
+				else:
+					settings_ui.revert()
 				hotkeys["inventory"].keys = [setting.key_inventory]
 				scene = settings_return_scene
 				if scene == "home":
@@ -140,6 +145,7 @@ while running:
 		elif scene == "game":
 			if event.type == pygame.KEYDOWN and event.key == setting.key_settings:
 				settings_return_scene = "game"
+				settings_ui.enter()
 				scene = "settings"
 				continue
 			if event.type == pygame.KEYDOWN:

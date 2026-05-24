@@ -61,6 +61,13 @@ def save(path=SETTINGS_PATH) -> None:
 		print(f"setting: 寫入 {path} 失敗：{e}")
 
 
+def restore(data: dict) -> None:
+	for key in _PERSIST_KEYS:
+		if key in data:
+			globals()[key] = data[key]
+	apply_audio()
+
+
 def register_sfx(sound) -> None:
 	if sound not in _sfx_sounds:
 		_sfx_sounds.append(sound)

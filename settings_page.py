@@ -5,6 +5,8 @@ import source
 
 WIDTH, HEIGHT = 960, 720
 FONT_PATH = os.path.join(os.path.dirname(__file__), "src", "fonts", "NotoSansTC.ttf")
+BUTTON_DIR = os.path.join(os.path.dirname(__file__), "src", "img", "button")
+BTN_SCALE = 0.62
 
 
 def _cjk_font(size: int) -> pygame.font.Font:
@@ -91,6 +93,37 @@ class SettingsPage:
 		self._hint = _cjk_font(20)
 		self._note = _cjk_font(16)
 		self._sliders = {"sfx": self.sfx, "music": self.music, "view": self.view, "typing": self.typing}
+		back = self._place_button("back", bottomright=(PANEL.right - 28, PANEL.bottom - 14))
+		save = self._place_button("save", bottomright=(back["rect"].left - 22, PANEL.bottom - 14))
+		self._buttons = {"save": save, "back": back}
+		self._snapshot = setting.to_dict()
+
+	def _place_button(self, name, **anchor):
+		img = pygame.image.load(os.path.join(BUTTON_DIR, f"{name}.png")).convert_alpha()
+		img = pygame.transform.smoothscale(img, (round(img.get_width() * BTN_SCALE), round(img.get_height() * BTN_SCALE)))
+		vis = img.get_bounding_rect()
+		rect = vis.copy()
+		for edge, value in anchor.items():
+			setattr(rect, edge, value)
+		return {"img": img, "pos": (rect.x - vis.x, rect.y - vis.y), "rect": rect}
+
+	def _sync_from_setting(self):
+		self.sfx.value = self.sfx._quantize(setting.sfx_volume)
+		self.music.value = self.music._quantize(setting.music_volume)
+		self.view.value = self.view._quantize(setting.tile_size)
+		self.typing.value = self.typing._quantize(setting.typing_speed)
+		self.seed.value = setting.configured_seed
+
+	def enter(self):
+		self._snapshot = setting.to_dict()
+		self._sync_from_setting()
+		self._defocus()
+		self.message = ""
+
+	def revert(self):
+		setting.restore(self._snapshot)
+		source.rescale()
+		self._sync_from_setting()
 
 	def _row_y(self, index):
 		return FIRST_Y + index * ROW_H
@@ -105,12 +138,11 @@ class SettingsPage:
 	def _key_rect(self, index):
 		return pygame.Rect(TRACK_X, self._row_y(6 + index), 160, 32)
 
-	def _back_rect(self):
-		return pygame.Rect(PANEL.right - 140, PANEL.bottom - 56, 110, 40)
-
 	def back_center(self):
-		r = self._back_rect()
-		return r.centerx, r.centery
+		return self._buttons["back"]["rect"].center
+
+	def save_center(self):
+		return self._buttons["save"]["rect"].center
 
 	def _apply(self):
 		setting.sfx_volume = self.sfx.value
@@ -152,8 +184,9 @@ class SettingsPage:
 		self.key_set.capturing = False
 
 	def _on_mouse_down(self, pos):
-		if self._back_rect().collidepoint(pos):
-			return "back"
+		for action in ("save", "back"):
+			if self._buttons[action]["rect"].collidepoint(pos):
+				return action
 		for name, s in self._sliders.items():
 			tx, cy, tw = self.slider_track(name)
 			track = pygame.Rect(tx, cy - 12, tw + 1, 24)
@@ -257,8 +290,13 @@ class SettingsPage:
 
 		if self.message:
 			screen.blit(self._hint.render(self.message, True, (255, 180, 180)), (LABEL_X, self._row_y(8)))
-		br = self._back_rect()
-		pygame.draw.rect(screen, (70, 90, 70), br)
-		pygame.draw.rect(screen, (200, 220, 200), br, 2)
-		back = self._font.render("返回", True, (235, 245, 235))
-		screen.blit(back, back.get_rect(center=br.center))
+		for action in ("save", "back"):
+			self._draw_button(screen, self._buttons[action])
+
+	def _draw_button(self, screen, btn):
+		img, pos, rect = btn["img"], btn["pos"], btn["rect"]
+		if rect.collidepoint(pygame.mouse.get_pos()):
+			big = pygame.transform.smoothscale(img, (round(img.get_width() * 1.08), round(img.get_height() * 1.08)))
+			screen.blit(big, big.get_rect(center=img.get_rect(topleft=pos).center))
+		else:
+			screen.blit(img, pos)
