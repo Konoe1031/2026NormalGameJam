@@ -5,8 +5,8 @@ class player_t:
 	def __init__(self):
 		self.images = source.girl["fallback"]
 		# the position of the feet
-		self.x = 75
-		self.y = -75
+		self.x = 0
+		self.y = 0
 		self.facing = "down"
 		self.touch_distance = 1
 		self.state = 0
