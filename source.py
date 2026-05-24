@@ -51,7 +51,8 @@ foreground_dict = {
 		"bone": {"chance": 1, "source": True},
 		"metal": {"chance": .5, "source": True},
 		"drug": {"chance": .1, "source": True},
-		"outlet": {"chance": .25, "source": False}
+		"outlet": {"chance": .25, "source": False},
+		"omuba": {"chance": 1, "source": True}
 	},
 	"lake": {
 		"meat": {"chance": 1, "source": True},
