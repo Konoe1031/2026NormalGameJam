@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 import inventory, map, source, base, home, story, bgm, hud
 from player import player_t
 from hotkey import hotkey_t
@@ -14,9 +14,57 @@ previous_frame_tick = 0
 player = player_t()
 bgm.play(bgm.MAIN_PAGE, 0.4)
 
+def enter_game():
+	global scene
+	bgm.play(bgm.MAIN_GAME, 0.38)
+	scene = "game"
+
+def enter_bad_virus_ending():
+	global scene
+	story.load("bad_virus")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
+
+def enter_bad_population_ending():
+	global scene
+	story.load("bad_population")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
+
+def enter_bad_science_ending():
+	global scene
+	story.load("bad_science")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
+
+def enter_bad_human_ending():
+	global scene
+	story.load("bad_human")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
+
+def enter_bad_mutation_ending():
+	global scene
+	story.load("bad_mutation")
+	bgm.play(bgm.BAD_END, 0.45)
+	scene = "bad_ending"
+
+def enter_real_ending():
+	global scene
+	story.load("real_end")
+	bgm.play(bgm.REAL_END, 0.45)
+	scene = "ending"
+
+def reached_escape_resources() -> bool:
+	return base.population > 100 and base.metal > 50 and base.plank > 50
+
 def check_interaction():
 	global player
 	if map.get_biome(player.x, player.y - 1, player) == "home":
+
+		if player.state > 80 and random.uniform(0, 100) < 20:
+			enter_bad_mutation_ending()
+			return
 		base.store_resource()
 	for x, y in map.interactable:
 		item = source.foreground_override[x, y]
@@ -61,14 +109,19 @@ while running:
 		elif scene == "story":
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
 				story.skip()
-				bgm.stop()
-				scene = "game"
+				enter_game()
 				continue
 			advance = (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1) or \
 				(event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN))
 			if advance and story.advance():
-				bgm.stop()
-				scene = "game"
+				enter_game()
+		elif scene == "bad_ending" or scene == "ending":
+			advance = (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1) or \
+				(event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN))
+			if advance and story.advance():
+				player = player_t()
+				bgm.play(bgm.MAIN_PAGE, 0.4)
+				scene = "home"
 		elif scene == "settings":
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				if home.handle_settings_click(event.pos) == "back":
@@ -82,6 +135,18 @@ while running:
 				for keys in hotkeys.values():
 					keys.check_up(event.key)
 	if scene == "game":
+		if player.state > 100:
+			enter_bad_virus_ending()
+			continue
+		if base.population <= 0:
+			enter_bad_population_ending()
+			continue
+		if reached_escape_resources():
+			if base.science > 70:
+				enter_bad_human_ending()
+			else:
+				enter_bad_science_ending()
+			continue
 		current_frame_tick = pygame.time.get_ticks() // 3000
 		if previous_frame_tick < current_frame_tick:
 			previous_frame_tick = current_frame_tick
@@ -107,6 +172,10 @@ while running:
 	elif scene == "home":
 		home.draw(screen)
 	elif scene == "story":
+		story.draw(screen)
+	elif scene == "bad_ending":
+		story.draw(screen)
+	elif scene == "ending":
 		story.draw(screen)
 	elif scene == "settings":
 		home.draw_settings(screen)

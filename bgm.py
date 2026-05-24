@@ -3,6 +3,9 @@ import pygame
 
 MAIN_PAGE = "./src/bgm/mainpage_tunetank-piano-classical-music-348133.mp3"
 CG = "./src/bgm/cg_konten_kreator-echoes-of-home-414068.mp3"
+MAIN_GAME = "./src/bgm/maingame_tunetank-cinematic-ambient-348342.mp3"
+BAD_END = "./src/bgm/badend_tunetank-classical-piano-background-347547.mp3"
+REAL_END = "./src/bgm/realend_andriig-emotional-emotional-music-497354.mp3"
 
 _channel: pygame.mixer.Channel | None = None
 _sounds: dict[str, pygame.mixer.Sound] = {}

@@ -36,6 +36,8 @@ def tick():
 	if food < 0:
 		population += food
 		food = 0
+	if population <= 0:
+		return
 	if food / population > .5:
 		population += math.sqrt(population) / 4
 	return
