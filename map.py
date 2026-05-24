@@ -20,6 +20,12 @@ blind_mask: pygame.Surface | None = None
 blind_mask_scaled: pygame.Surface | None = None
 blind_mask_size: Tuple[int, int] | None = None
 
+def reset():
+	global virus_flash_until
+	virus_waves.clear()
+	virus_next_times.clear()
+	virus_flash_until = 0
+
 def __play_virus_wave_sound():
 	global virus_wave_sound
 	if not pygame.mixer.get_init():
@@ -155,16 +161,20 @@ def __get_screen_position(screen: pygame.Surface, player: player_t, x: int, y: i
 	px = player.x * setting.tile_size - screen.get_width() / 2
 	py = player.y * setting.tile_size - screen.get_height() / 2
 	return x * setting.tile_size - px, y * setting.tile_size - py
-def __draw_home(screen: pygame.Surface, player: player_t):
+def __get_home_rect(screen: pygame.Surface, player: player_t) -> pygame.Rect:
 	home = source.structures["home"]
 	home_x, home_y = setting.home_position
 	x, tile_y = __get_screen_position(screen, player, home_x, home_y)
 	y = tile_y - home.get_height() + setting.tile_size
-	if x > screen.get_width() or x + home.get_width() < 0:
+	return pygame.Rect(round(x), round(y), home.get_width(), home.get_height())
+def __rect_visible(screen: pygame.Surface, rect: pygame.Rect) -> bool:
+	return rect.colliderect(screen.get_rect())
+def __draw_home(screen: pygame.Surface, player: player_t):
+	home = source.structures["home"]
+	rect = __get_home_rect(screen, player)
+	if not __rect_visible(screen, rect):
 		return
-	if y > screen.get_height() or y + home.get_height() < 0:
-		return
-	screen.blit(home, (x, y))
+	screen.blit(home, rect.topleft)
 def __draw_shop(screen: pygame.Surface, player: player_t):
 	home = source.structures["shop"]
 	home_x, home_y = setting.shop_position
@@ -175,6 +185,30 @@ def __draw_shop(screen: pygame.Surface, player: player_t):
 	if y > screen.get_height() or y + home.get_height() < 0:
 		return
 	screen.blit(home, (x, y))
+def draw_base_arrow(screen: pygame.Surface, player: player_t):
+	home_rect = __get_home_rect(screen, player)
+	if __rect_visible(screen, home_rect):
+		return
+	arrow = source.arrow_icon
+	if arrow == None:
+		return
+	screen_center = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+	target = pygame.Vector2(home_rect.center)
+	direction = target - screen_center
+	if direction.length_squared() == 0:
+		return
+	angle = -math.degrees(math.atan2(direction.x, -direction.y))
+	rotated = pygame.transform.rotozoom(arrow, angle, 1)
+	margin = max(setting.tile_size, rotated.get_width() / 2, rotated.get_height() / 2)
+	direction = direction.normalize()
+	limit_x = screen.get_width() / 2 - margin
+	limit_y = screen.get_height() / 2 - margin
+	scale = min(
+		limit_x / abs(direction.x) if abs(direction.x) > 0.001 else float("inf"),
+		limit_y / abs(direction.y) if abs(direction.y) > 0.001 else float("inf")
+	)
+	pos = screen_center + direction * max(0, scale)
+	screen.blit(rotated, rotated.get_rect(center=(round(pos.x), round(pos.y))))
 def __update_virus_outlet(ix: int, iy: int):
 	now = pygame.time.get_ticks()
 	key = (int(ix), int(iy))
